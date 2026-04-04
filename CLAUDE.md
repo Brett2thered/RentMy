@@ -82,7 +82,9 @@ Every session follows this protocol. No exceptions.
 3. **Read** the task's phase plan (`.claude/plan/phase-{N}-*.md`) and PRD sections listed in `prdRefs`
 4. **Read** handoff docs for completed dependency tasks (for context)
 5. **Set** task status to `"in_progress"` in progress.json
-6. **Create branch** for this task: `/opt/homebrew/bin/gt create task-{N}.{M}-{short-name}` (see Branching below)
+6. **Create branch** for this task (see Branching below):
+   - Try: `/opt/homebrew/bin/gt create task-{N}.{M}-{short-name}`
+   - If gt fails or is unavailable: `git checkout -b task-{N}.{M}-{short-name}`
 7. **Implement** ONE task only — do not start a second task
 8. **Verify** using the task's `verificationCommands` plus the checklist in `.claude/verification.md`
 9. **If verification passes:**
@@ -91,7 +93,9 @@ Every session follows this protocol. No exceptions.
    - Update continuity ledger: `thoughts/ledgers/CONTINUITY_CLAUDE-phase-{N}-{name}.md`
    - Update progress.json: set task `"status": "completed"`, record `commitSha`
    - Validate JSON: `cat .claude/progress.json | python3 -m json.tool > /dev/null`
-   - Push the branch: `/opt/homebrew/bin/gt submit --no-edit`
+   - Push the branch:
+     - Try: `/opt/homebrew/bin/gt submit --no-edit`
+     - If gt fails: `git push -u origin task-{N}.{M}-{short-name}`
 10. **If verification fails:** fix the issue and retry. Do NOT move to the next task
 
 ### Recovery Protocol
@@ -194,13 +198,15 @@ Shared infrastructure lives in `backend/internal/platform/{package}/`:
 
 ## Git & Branching Conventions
 
-### Stacked Branches (Graphite)
+### Stacked Branches (Graphite preferred, git fallback)
 
-We use [Graphite](https://graphite.dev) for stacked PRs. **Each task gets its own branch** that stacks on top of the previous task's branch. The Graphite CLI is at `/opt/homebrew/bin/gt`.
+We use [Graphite](https://graphite.dev) for stacked PRs when available. **Each task gets its own branch** that stacks on top of the previous task's branch. The Graphite CLI is at `/opt/homebrew/bin/gt`.
+
+**If Graphite is not available** (gt not installed, repo not initialized for Graphite, or gt commands fail), fall back to vanilla git. The branch naming and one-branch-per-task rule still apply — we maintain a manual stack via sequential branching.
 
 **Branch naming:** `task-{N}.{M}-{short-name}` (e.g., `task-1.1-user-service`, `task-1.2-media-service`)
 
-**Workflow per task:**
+**Workflow per task (Graphite mode):**
 ```bash
 # 1. Create a new stacked branch for this task
 /opt/homebrew/bin/gt create task-1.1-user-service
@@ -216,7 +222,29 @@ git commit -m "feat: add UserService with registration and JWT auth"
 /opt/homebrew/bin/gt submit --no-edit
 ```
 
-**Rules:**
+**Workflow per task (git fallback mode):**
+```bash
+# 1. Create a new branch from current HEAD
+git checkout -b task-1.1-user-service
+
+# 2. Implement the task, then stage and commit
+git add <files>
+git commit -m "feat: add UserService with registration and JWT auth"
+
+# 3. If you need to amend:
+git commit --amend --no-edit
+
+# 4. Push branch to remote:
+git push -u origin task-1.1-user-service
+```
+
+**How to decide which mode to use:**
+1. Try `/opt/homebrew/bin/gt create <branch>` first
+2. If it succeeds, you are in Graphite mode for this session — use `gt modify`, `gt submit`
+3. If it fails (command not found, repo not initialized, permission error, etc.), use git fallback for the rest of the session
+4. Log which mode was used in the handoff doc
+
+**Graphite rules (when in Graphite mode):**
 - **Never use `git rebase` directly** — it breaks Graphite stack metadata
 - **Never use `git merge` or `git pull`** — use `/opt/homebrew/bin/gt sync --no-interactive` instead
 - **Use `gt modify` instead of `git commit --amend`** — it automatically restacks descendants

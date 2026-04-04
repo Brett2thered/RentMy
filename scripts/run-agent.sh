@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
-# Autonomous Coding Agent Runner (Graphite stacked branches)
+# Autonomous Coding Agent Runner
 # Inspired by: https://github.com/anthropics/claude-quickstarts/tree/main/autonomous-coding
 #
-# Each task creates its own branch via `gt create`, stacking on the previous.
-# Use `gt submit --stack --no-edit` to push the entire stack for review.
+# Each task creates its own branch. Prefers Graphite (`gt create`) for stacked
+# PRs, but falls back to vanilla git (`git checkout -b`) if gt is unavailable.
 #
 # Usage:
 #   ./scripts/run-agent.sh              # Run until all phases complete
@@ -19,6 +19,7 @@ LOG_DIR="$REPO_ROOT/thoughts/agent-logs"
 GT="/opt/homebrew/bin/gt"
 MAX_TURNS=200
 PAUSE_BETWEEN_SESSIONS=10
+USE_GT=false
 
 # Parse flags
 DRY_RUN=false
@@ -42,9 +43,18 @@ if ! python3 -m json.tool "$PROGRESS_FILE" > /dev/null 2>&1; then
   exit 1
 fi
 
-if [[ ! -x "$GT" ]]; then
-  echo "ERROR: Graphite CLI not found at $GT. Install via: brew install withgraphite/tap/graphite"
-  exit 1
+# Detect Graphite availability (non-fatal — falls back to vanilla git)
+if [[ -x "$GT" ]]; then
+  # gt binary exists; verify it can operate in this repo
+  if "$GT" log --oneline -1 > /dev/null 2>&1; then
+    USE_GT=true
+  else
+    echo "WARNING: Graphite CLI found but repo not initialized. Falling back to vanilla git."
+    echo "  To enable: cd $REPO_ROOT && $GT init"
+  fi
+else
+  echo "WARNING: Graphite CLI not found at $GT. Falling back to vanilla git."
+  echo "  To install: brew install withgraphite/tap/graphite"
 fi
 
 mkdir -p "$LOG_DIR"
@@ -101,7 +111,11 @@ echo "  (Graphite stacked branches)"
 echo "=========================================="
 echo "Progress file: $PROGRESS_FILE"
 echo "Target phase:  ${TARGET_PHASE:-all}"
-echo "Graphite CLI:  $GT ($($GT --version))"
+if $USE_GT; then
+  echo "Branching:     Graphite ($GT, $($GT --version))"
+else
+  echo "Branching:     vanilla git (Graphite unavailable)"
+fi
 echo ""
 
 while true; do
@@ -113,8 +127,14 @@ while true; do
 
     # Offer to submit the full stack
     echo ""
-    echo "To submit all stacked PRs:"
-    echo "  $GT submit --stack --no-edit"
+    if $USE_GT; then
+      echo "To submit all stacked PRs:"
+      echo "  $GT submit --stack --no-edit"
+    else
+      echo "Branches were created with vanilla git."
+      echo "Push any remaining branches with: git push -u origin <branch>"
+      echo "When Graphite is enabled, import existing branches with: $GT init"
+    fi
     exit 0
   fi
 
@@ -138,10 +158,16 @@ while true; do
     exit 0
   fi
 
+  # Build the branching instruction for the agent
+  if $USE_GT; then
+    BRANCH_INSTRUCTION="Use /opt/homebrew/bin/gt for branch management (Graphite mode)."
+  else
+    BRANCH_INSTRUCTION="Graphite is unavailable — use vanilla git for branching (git checkout -b, git push -u origin)."
+  fi
+
   # Run Claude Code session
-  # The agent will create a gt branch, implement, commit, and gt submit per CLAUDE.md
   claude --print \
-    "Read CLAUDE.md, then follow the Session Workflow to implement the next task. One task only. Use /opt/homebrew/bin/gt for branch management." \
+    "Read CLAUDE.md, then follow the Session Workflow to implement the next task. One task only. ${BRANCH_INSTRUCTION}" \
     --max-turns "$MAX_TURNS" \
     --verbose \
     2>&1 | tee "$LOG_FILE"
