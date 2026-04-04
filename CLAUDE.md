@@ -82,15 +82,17 @@ Every session follows this protocol. No exceptions.
 3. **Read** the task's phase plan (`.claude/plan/phase-{N}-*.md`) and PRD sections listed in `prdRefs`
 4. **Read** handoff docs for completed dependency tasks (for context)
 5. **Set** task status to `"in_progress"` in progress.json
-6. **Implement** ONE task only — do not start a second task
-7. **Verify** using the task's `verificationCommands` plus the checklist in `.claude/verification.md`
-8. **If verification passes:**
-   - Commit with Conventional Commit message (`feat:`, `fix:`, `chore:`)
+6. **Create branch** for this task: `/opt/homebrew/bin/gt create task-{N}.{M}-{short-name}` (see Branching below)
+7. **Implement** ONE task only — do not start a second task
+8. **Verify** using the task's `verificationCommands` plus the checklist in `.claude/verification.md`
+9. **If verification passes:**
+   - Stage files and commit with Conventional Commit message (`feat:`, `fix:`, `chore:`)
    - Write handoff doc: `thoughts/handoffs/phase-{N}-{name}/task-{NN}-{name}.md`
    - Update continuity ledger: `thoughts/ledgers/CONTINUITY_CLAUDE-phase-{N}-{name}.md`
    - Update progress.json: set task `"status": "completed"`, record `commitSha`
    - Validate JSON: `cat .claude/progress.json | python3 -m json.tool > /dev/null`
-9. **If verification fails:** fix the issue and retry. Do NOT move to the next task
+   - Push the branch: `/opt/homebrew/bin/gt submit --no-edit`
+10. **If verification fails:** fix the issue and retry. Do NOT move to the next task
 
 ### Recovery Protocol
 
@@ -190,7 +192,38 @@ Shared infrastructure lives in `backend/internal/platform/{package}/`:
 
 ---
 
-## Git Conventions
+## Git & Branching Conventions
+
+### Stacked Branches (Graphite)
+
+We use [Graphite](https://graphite.dev) for stacked PRs. **Each task gets its own branch** that stacks on top of the previous task's branch. The Graphite CLI is at `/opt/homebrew/bin/gt`.
+
+**Branch naming:** `task-{N}.{M}-{short-name}` (e.g., `task-1.1-user-service`, `task-1.2-media-service`)
+
+**Workflow per task:**
+```bash
+# 1. Create a new stacked branch for this task
+/opt/homebrew/bin/gt create task-1.1-user-service
+
+# 2. Implement the task, then stage and commit
+git add <files>
+git commit -m "feat: add UserService with registration and JWT auth"
+
+# 3. If you need to amend (do NOT use git commit --amend):
+/opt/homebrew/bin/gt modify --no-edit
+
+# 4. Push branch and create/update PR:
+/opt/homebrew/bin/gt submit --no-edit
+```
+
+**Rules:**
+- **Never use `git rebase` directly** — it breaks Graphite stack metadata
+- **Never use `git merge` or `git pull`** — use `/opt/homebrew/bin/gt sync --no-interactive` instead
+- **Use `gt modify` instead of `git commit --amend`** — it automatically restacks descendants
+- **One commit per branch** (use `gt modify` to amend as you iterate)
+- **Always pass `--no-edit`** to `gt submit` to skip interactive prompts
+
+### Commit Messages
 
 - **Conventional Commits:** `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`
 - Imperative, present-tense messages — explain *why*, not *what*

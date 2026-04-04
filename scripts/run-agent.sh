@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 #
-# Autonomous Coding Agent Runner
+# Autonomous Coding Agent Runner (Graphite stacked branches)
 # Inspired by: https://github.com/anthropics/claude-quickstarts/tree/main/autonomous-coding
+#
+# Each task creates its own branch via `gt create`, stacking on the previous.
+# Use `gt submit --stack --no-edit` to push the entire stack for review.
 #
 # Usage:
 #   ./scripts/run-agent.sh              # Run until all phases complete
@@ -13,6 +16,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PROGRESS_FILE="$REPO_ROOT/.claude/progress.json"
 LOG_DIR="$REPO_ROOT/thoughts/agent-logs"
+GT="/opt/homebrew/bin/gt"
 MAX_TURNS=200
 PAUSE_BETWEEN_SESSIONS=10
 
@@ -27,15 +31,19 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Ensure progress file exists
+# Ensure prerequisites
 if [[ ! -f "$PROGRESS_FILE" ]]; then
   echo "ERROR: $PROGRESS_FILE not found. Run Stage A setup first."
   exit 1
 fi
 
-# Validate progress.json
 if ! python3 -m json.tool "$PROGRESS_FILE" > /dev/null 2>&1; then
   echo "ERROR: $PROGRESS_FILE is not valid JSON."
+  exit 1
+fi
+
+if [[ ! -x "$GT" ]]; then
+  echo "ERROR: Graphite CLI not found at $GT. Install via: brew install withgraphite/tap/graphite"
   exit 1
 fi
 
@@ -89,9 +97,11 @@ SESSION_COUNT=0
 
 echo "=========================================="
 echo "  RentMy Autonomous Coding Agent"
+echo "  (Graphite stacked branches)"
 echo "=========================================="
 echo "Progress file: $PROGRESS_FILE"
 echo "Target phase:  ${TARGET_PHASE:-all}"
+echo "Graphite CLI:  $GT ($($GT --version))"
 echo ""
 
 while true; do
@@ -100,6 +110,11 @@ while true; do
     echo ""
     echo "All ${TARGET_PHASE:+Phase $TARGET_PHASE }tasks complete!"
     echo "Total sessions: $SESSION_COUNT"
+
+    # Offer to submit the full stack
+    echo ""
+    echo "To submit all stacked PRs:"
+    echo "  $GT submit --stack --no-edit"
     exit 0
   fi
 
@@ -124,8 +139,9 @@ while true; do
   fi
 
   # Run Claude Code session
+  # The agent will create a gt branch, implement, commit, and gt submit per CLAUDE.md
   claude --print \
-    "Read CLAUDE.md, then follow the Session Workflow to implement the next task. One task only." \
+    "Read CLAUDE.md, then follow the Session Workflow to implement the next task. One task only. Use /opt/homebrew/bin/gt for branch management." \
     --max-turns "$MAX_TURNS" \
     --verbose \
     2>&1 | tee "$LOG_FILE"
