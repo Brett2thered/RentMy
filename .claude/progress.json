@@ -29,7 +29,9 @@
           "name": "Docker Compose + PostgreSQL + PostGIS + migrations",
           "status": "completed",
           "domain": "backend",
-          "dependencies": ["0.1"],
+          "dependencies": [
+            "0.1"
+          ],
           "commitSha": "b950834",
           "handoff": "thoughts/handoffs/phase-0-foundation/task-02-docker-postgres.md",
           "verificationPassed": true
@@ -39,7 +41,9 @@
           "name": "Redis integration",
           "status": "completed",
           "domain": "backend",
-          "dependencies": ["0.1"],
+          "dependencies": [
+            "0.1"
+          ],
           "commitSha": "b950834",
           "handoff": "thoughts/handoffs/phase-0-foundation/task-03-05-06-redis-s3-pusher.md",
           "verificationPassed": true
@@ -49,7 +53,9 @@
           "name": "River job queue",
           "status": "completed",
           "domain": "backend",
-          "dependencies": ["0.2"],
+          "dependencies": [
+            "0.2"
+          ],
           "commitSha": "b950834",
           "handoff": "thoughts/handoffs/phase-0-foundation/task-04-river.md",
           "verificationPassed": true
@@ -59,7 +65,9 @@
           "name": "S3 storage",
           "status": "completed",
           "domain": "backend",
-          "dependencies": ["0.1"],
+          "dependencies": [
+            "0.1"
+          ],
           "commitSha": "b950834",
           "handoff": "thoughts/handoffs/phase-0-foundation/task-03-05-06-redis-s3-pusher.md",
           "verificationPassed": true
@@ -69,7 +77,9 @@
           "name": "Pusher integration",
           "status": "completed",
           "domain": "backend",
-          "dependencies": ["0.1"],
+          "dependencies": [
+            "0.1"
+          ],
           "commitSha": "b950834",
           "handoff": "thoughts/handoffs/phase-0-foundation/task-03-05-06-redis-s3-pusher.md",
           "verificationPassed": true
@@ -89,7 +99,10 @@
           "name": "GitHub Actions CI",
           "status": "completed",
           "domain": "infra",
-          "dependencies": ["0.1", "0.7"],
+          "dependencies": [
+            "0.1",
+            "0.7"
+          ],
           "commitSha": "8be57fd",
           "handoff": "thoughts/handoffs/phase-0-foundation/task-08-ci.md",
           "verificationPassed": true
@@ -105,11 +118,13 @@
         {
           "id": "1.1",
           "name": "UserService (backend)",
-          "status": "pending",
+          "status": "in_progress",
           "domain": "backend",
           "dependencies": [],
           "planRef": ".claude/plan/phase-1-supply.md#step-11",
-          "prdRefs": ["rentmy-prd-v8.md §5-6 (system architecture, data models)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a75-6 (system architecture, data models)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -122,9 +137,14 @@
           "name": "MediaService (backend)",
           "status": "pending",
           "domain": "backend",
-          "dependencies": ["1.1"],
+          "dependencies": [
+            "1.1"
+          ],
           "planRef": ".claude/plan/phase-1-supply.md#step-12",
-          "prdRefs": ["rentmy-prd-v8.md §6 (media table)", "rentmy-prd-v8.md §11 (photo requirements)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a76 (media table)",
+            "rentmy-prd-v8.md \u00a711 (photo requirements)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -136,9 +156,15 @@
           "name": "ListingService (backend)",
           "status": "pending",
           "domain": "backend",
-          "dependencies": ["1.1", "1.2"],
+          "dependencies": [
+            "1.1",
+            "1.2"
+          ],
           "planRef": ".claude/plan/phase-1-supply.md#step-13",
-          "prdRefs": ["rentmy-prd-v8.md §6 (listings table)", "rentmy-prd-v8.md §7 (7-day ceiling)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a76 (listings table)",
+            "rentmy-prd-v8.md \u00a77 (7-day ceiling)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -150,7 +176,9 @@
           "name": "Auth screens (RN)",
           "status": "pending",
           "domain": "mobile",
-          "dependencies": ["1.1"],
+          "dependencies": [
+            "1.1"
+          ],
           "planRef": ".claude/plan/phase-1-supply.md#step-14",
           "prdRefs": [],
           "verificationCommands": [
@@ -162,9 +190,14 @@
           "name": "Listing creation flow (RN)",
           "status": "pending",
           "domain": "mobile",
-          "dependencies": ["1.3", "1.4"],
+          "dependencies": [
+            "1.3",
+            "1.4"
+          ],
           "planRef": ".claude/plan/phase-1-supply.md#step-15",
-          "prdRefs": ["rentmy-prd-v8.md §11 (angle enforcement, gyroscope)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a711 (angle enforcement, gyroscope)"
+          ],
           "verificationCommands": [
             "cd mobile && npx tsc --noEmit"
           ]
@@ -174,7 +207,9 @@
           "name": "Profile screen (RN)",
           "status": "pending",
           "domain": "mobile",
-          "dependencies": ["1.4"],
+          "dependencies": [
+            "1.4"
+          ],
           "planRef": ".claude/plan/phase-1-supply.md#step-16",
           "prdRefs": [],
           "verificationCommands": [
@@ -187,7 +222,9 @@
       "id": 2,
       "name": "Discovery + Payments (Demand)",
       "status": "pending",
-      "blockedBy": [1],
+      "blockedBy": [
+        1
+      ],
       "tasks": [
         {
           "id": "2.1",
@@ -196,7 +233,10 @@
           "domain": "backend",
           "dependencies": [],
           "planRef": ".claude/plan/phase-2-demand.md#step-21",
-          "prdRefs": ["rentmy-prd-v8.md §13 (ranking algorithm)", "rentmy-prd-v8.md §6 (listings table, PostGIS)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a713 (ranking algorithm)",
+            "rentmy-prd-v8.md \u00a76 (listings table, PostGIS)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -210,7 +250,9 @@
           "domain": "backend",
           "dependencies": [],
           "planRef": ".claude/plan/phase-2-demand.md#step-22",
-          "prdRefs": ["rentmy-prd-v8.md §7 (tiered holds, guarantee fund, hold allocation)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a77 (tiered holds, guarantee fund, hold allocation)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -222,7 +264,9 @@
           "name": "Feed screen (RN)",
           "status": "pending",
           "domain": "mobile",
-          "dependencies": ["2.1"],
+          "dependencies": [
+            "2.1"
+          ],
           "planRef": ".claude/plan/phase-2-demand.md#step-23",
           "prdRefs": [],
           "verificationCommands": [
@@ -234,7 +278,9 @@
           "name": "Search screen (RN)",
           "status": "pending",
           "domain": "mobile",
-          "dependencies": ["2.1"],
+          "dependencies": [
+            "2.1"
+          ],
           "planRef": ".claude/plan/phase-2-demand.md#step-24",
           "prdRefs": [],
           "verificationCommands": [
@@ -246,7 +292,9 @@
           "name": "Map screen (RN)",
           "status": "pending",
           "domain": "mobile",
-          "dependencies": ["2.1"],
+          "dependencies": [
+            "2.1"
+          ],
           "planRef": ".claude/plan/phase-2-demand.md#step-25",
           "prdRefs": [],
           "verificationCommands": [
@@ -258,7 +306,10 @@
           "name": "Listing detail screen (RN)",
           "status": "pending",
           "domain": "mobile",
-          "dependencies": ["2.1", "2.2"],
+          "dependencies": [
+            "2.1",
+            "2.2"
+          ],
           "planRef": ".claude/plan/phase-2-demand.md#step-26",
           "prdRefs": [],
           "verificationCommands": [
@@ -270,9 +321,14 @@
           "name": "Checkout screen (RN)",
           "status": "pending",
           "domain": "mobile",
-          "dependencies": ["2.2", "2.6"],
+          "dependencies": [
+            "2.2",
+            "2.6"
+          ],
           "planRef": ".claude/plan/phase-2-demand.md#step-27",
-          "prdRefs": ["rentmy-prd-v8.md §7 (hold amount display)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a77 (hold amount display)"
+          ],
           "verificationCommands": [
             "cd mobile && npx tsc --noEmit"
           ]
@@ -283,7 +339,9 @@
       "id": 3,
       "name": "Core Transaction Loop",
       "status": "pending",
-      "blockedBy": [2],
+      "blockedBy": [
+        2
+      ],
       "tasks": [
         {
           "id": "3.1",
@@ -292,7 +350,11 @@
           "domain": "backend",
           "dependencies": [],
           "planRef": ".claude/plan/phase-3-transaction.md#step-31",
-          "prdRefs": ["rentmy-prd-v8.md §17 (state machine)", "rentmy-prd-v8.md §18 (cancellation)", "rentmy-prd-v8.md §9 (fraud velocity)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a717 (state machine)",
+            "rentmy-prd-v8.md \u00a718 (cancellation)",
+            "rentmy-prd-v8.md \u00a79 (fraud velocity)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -304,9 +366,13 @@
           "name": "ProximityService (backend)",
           "status": "pending",
           "domain": "backend",
-          "dependencies": ["3.1"],
+          "dependencies": [
+            "3.1"
+          ],
           "planRef": ".claude/plan/phase-3-transaction.md#step-32",
-          "prdRefs": ["rentmy-prd-v8.md §12 (proximity handoff)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a712 (proximity handoff)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -320,7 +386,9 @@
           "domain": "backend",
           "dependencies": [],
           "planRef": ".claude/plan/phase-3-transaction.md#step-33",
-          "prdRefs": ["rentmy-prd-v8.md §16 (notification types)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a716 (notification types)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -334,7 +402,9 @@
           "domain": "backend",
           "dependencies": [],
           "planRef": ".claude/plan/phase-3-transaction.md#step-34",
-          "prdRefs": ["rentmy-prd-v8.md §6 (messages table)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a76 (messages table)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -346,7 +416,9 @@
           "name": "Booking flow (RN)",
           "status": "pending",
           "domain": "mobile",
-          "dependencies": ["3.1"],
+          "dependencies": [
+            "3.1"
+          ],
           "planRef": ".claude/plan/phase-3-transaction.md#step-35",
           "prdRefs": [],
           "verificationCommands": [
@@ -358,9 +430,14 @@
           "name": "Handoff screens (RN)",
           "status": "pending",
           "domain": "mobile",
-          "dependencies": ["3.2", "3.5"],
+          "dependencies": [
+            "3.2",
+            "3.5"
+          ],
           "planRef": ".claude/plan/phase-3-transaction.md#step-36",
-          "prdRefs": ["rentmy-prd-v8.md §11 (angle enforcement at check-in/check-out)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a711 (angle enforcement at check-in/check-out)"
+          ],
           "verificationCommands": [
             "cd mobile && npx tsc --noEmit"
           ]
@@ -370,7 +447,9 @@
           "name": "Messaging screen (RN)",
           "status": "pending",
           "domain": "mobile",
-          "dependencies": ["3.4"],
+          "dependencies": [
+            "3.4"
+          ],
           "planRef": ".claude/plan/phase-3-transaction.md#step-37",
           "prdRefs": [],
           "verificationCommands": [
@@ -383,7 +462,9 @@
       "id": 4,
       "name": "AI Agents (Intelligence)",
       "status": "pending",
-      "blockedBy": [3],
+      "blockedBy": [
+        3
+      ],
       "tasks": [
         {
           "id": "4.1",
@@ -392,7 +473,10 @@
           "domain": "backend",
           "dependencies": [],
           "planRef": ".claude/plan/phase-4-intelligence.md#step-41",
-          "prdRefs": ["rentmy-prd-v8.md §5 (model router)", "rentmy-prd-v8.md §31 (agent learning)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a75 (model router)",
+            "rentmy-prd-v8.md \u00a731 (agent learning)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -404,9 +488,13 @@
           "name": "VerificationAgent",
           "status": "pending",
           "domain": "backend",
-          "dependencies": ["4.1"],
+          "dependencies": [
+            "4.1"
+          ],
           "planRef": ".claude/plan/phase-4-intelligence.md#step-42",
-          "prdRefs": ["rentmy-prd-v8.md §6 (identity_status)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a76 (identity_status)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -418,9 +506,13 @@
           "name": "AppraisalAgent",
           "status": "pending",
           "domain": "backend",
-          "dependencies": ["4.1"],
+          "dependencies": [
+            "4.1"
+          ],
           "planRef": ".claude/plan/phase-4-intelligence.md#step-43",
-          "prdRefs": ["rentmy-prd-v8.md §6 (AI listing fields)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a76 (AI listing fields)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -432,9 +524,13 @@
           "name": "RiskAgent",
           "status": "pending",
           "domain": "backend",
-          "dependencies": ["4.1"],
+          "dependencies": [
+            "4.1"
+          ],
           "planRef": ".claude/plan/phase-4-intelligence.md#step-44",
-          "prdRefs": ["rentmy-prd-v8.md §8 (dual-score system)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a78 (dual-score system)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -446,9 +542,13 @@
           "name": "AgreementAgent",
           "status": "pending",
           "domain": "backend",
-          "dependencies": ["4.1"],
+          "dependencies": [
+            "4.1"
+          ],
           "planRef": ".claude/plan/phase-4-intelligence.md#step-45",
-          "prdRefs": ["rentmy-prd-v8.md §14 (agreement system)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a714 (agreement system)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -460,7 +560,9 @@
           "name": "Wire KYC into booking flow (RN)",
           "status": "pending",
           "domain": "mobile",
-          "dependencies": ["4.2"],
+          "dependencies": [
+            "4.2"
+          ],
           "planRef": ".claude/plan/phase-4-intelligence.md#step-46",
           "prdRefs": [],
           "verificationCommands": [
@@ -472,7 +574,9 @@
           "name": "Wire AI autofill into listing creation (RN)",
           "status": "pending",
           "domain": "mobile",
-          "dependencies": ["4.3"],
+          "dependencies": [
+            "4.3"
+          ],
           "planRef": ".claude/plan/phase-4-intelligence.md#step-47",
           "prdRefs": [],
           "verificationCommands": [
@@ -484,7 +588,10 @@
           "name": "Backfill existing data",
           "status": "pending",
           "domain": "backend",
-          "dependencies": ["4.3", "4.4"],
+          "dependencies": [
+            "4.3",
+            "4.4"
+          ],
           "planRef": ".claude/plan/phase-4-intelligence.md#step-48",
           "prdRefs": [],
           "verificationCommands": [
@@ -499,7 +606,9 @@
       "id": 5,
       "name": "Returns, Disputes, Trust",
       "status": "pending",
-      "blockedBy": [4],
+      "blockedBy": [
+        4
+      ],
       "tasks": [
         {
           "id": "5.1",
@@ -508,7 +617,9 @@
           "domain": "backend",
           "dependencies": [],
           "planRef": ".claude/plan/phase-5-closing-loop.md#step-51",
-          "prdRefs": ["rentmy-prd-v8.md §11 (photo diff pipeline, two-stage)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a711 (photo diff pipeline, two-stage)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -520,9 +631,14 @@
           "name": "DisputeAgent with escalation gate",
           "status": "pending",
           "domain": "backend",
-          "dependencies": ["5.1"],
+          "dependencies": [
+            "5.1"
+          ],
           "planRef": ".claude/plan/phase-5-closing-loop.md#step-52",
-          "prdRefs": ["rentmy-prd-v8.md §20 (escalation gate)", "rentmy-prd-v8.md §7 (hold allocation)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a720 (escalation gate)",
+            "rentmy-prd-v8.md \u00a77 (hold allocation)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -536,7 +652,9 @@
           "domain": "backend",
           "dependencies": [],
           "planRef": ".claude/plan/phase-5-closing-loop.md#step-53",
-          "prdRefs": ["rentmy-prd-v8.md §19 (late return escalation)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a719 (late return escalation)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -550,7 +668,9 @@
           "domain": "backend",
           "dependencies": [],
           "planRef": ".claude/plan/phase-5-closing-loop.md#step-54",
-          "prdRefs": ["rentmy-prd-v8.md §15 (rating bubbles)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a715 (rating bubbles)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -563,9 +683,13 @@
           "name": "Reputation score recalculation",
           "status": "pending",
           "domain": "backend",
-          "dependencies": ["5.4"],
+          "dependencies": [
+            "5.4"
+          ],
           "planRef": ".claude/plan/phase-5-closing-loop.md#step-55",
-          "prdRefs": ["rentmy-prd-v8.md §8 (reputation scoring)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a78 (reputation scoring)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -579,7 +703,9 @@
           "domain": "backend",
           "dependencies": [],
           "planRef": ".claude/plan/phase-5-closing-loop.md#step-56",
-          "prdRefs": ["rentmy-prd-v8.md §7 (guarantee fund, reserve ratio)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a77 (guarantee fund, reserve ratio)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -591,9 +717,15 @@
           "name": "Outcome linking (Agent Learning Framework)",
           "status": "pending",
           "domain": "backend",
-          "dependencies": ["5.2", "5.3", "5.5"],
+          "dependencies": [
+            "5.2",
+            "5.3",
+            "5.5"
+          ],
           "planRef": ".claude/plan/phase-5-closing-loop.md#step-57",
-          "prdRefs": ["rentmy-prd-v8.md §31 (agent learning framework)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a731 (agent learning framework)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -605,7 +737,10 @@
           "name": "Post-rental flow (RN)",
           "status": "pending",
           "domain": "mobile",
-          "dependencies": ["5.2", "5.4"],
+          "dependencies": [
+            "5.2",
+            "5.4"
+          ],
           "planRef": ".claude/plan/phase-5-closing-loop.md#step-58",
           "prdRefs": [],
           "verificationCommands": [
@@ -618,7 +753,9 @@
       "id": 6,
       "name": "Operations + Growth",
       "status": "pending",
-      "blockedBy": [5],
+      "blockedBy": [
+        5
+      ],
       "tasks": [
         {
           "id": "6.1",
@@ -627,7 +764,9 @@
           "domain": "backend",
           "dependencies": [],
           "planRef": ".claude/plan/phase-6-operations.md#step-61",
-          "prdRefs": ["rentmy-prd-v8.md §25 (ops metrics, alerts)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a725 (ops metrics, alerts)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -641,7 +780,9 @@
           "domain": "backend",
           "dependencies": [],
           "planRef": ".claude/plan/phase-6-operations.md#step-62",
-          "prdRefs": ["rentmy-prd-v8.md §9 (fraud signals, WiFi compound-only)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a79 (fraud signals, WiFi compound-only)"
+          ],
           "verificationCommands": [
             "cd backend && go vet ./...",
             "cd backend && go build ./cmd/server",
@@ -653,9 +794,15 @@
           "name": "Ops dashboard (web)",
           "status": "pending",
           "domain": "web",
-          "dependencies": ["6.1", "6.2"],
+          "dependencies": [
+            "6.1",
+            "6.2"
+          ],
           "planRef": ".claude/plan/phase-6-operations.md#step-63",
-          "prdRefs": ["rentmy-prd-v8.md §25 (dashboard metrics)", "rentmy-prd-v8.md §31 (agent learning dashboard)"],
+          "prdRefs": [
+            "rentmy-prd-v8.md \u00a725 (dashboard metrics)",
+            "rentmy-prd-v8.md \u00a731 (agent learning dashboard)"
+          ],
           "verificationCommands": [
             "cd ops && npx tsc --noEmit",
             "cd ops && npm run build"
