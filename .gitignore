@@ -1,5 +1,6 @@
 # Go
 backend/bin/
+backend/server
 *.exe
 *.dll
 *.so
@@ -17,6 +18,7 @@ mobile/web-build/
 .env
 .env.local
 .env.*.local
+.env.individual
 
 # IDE
 .idea/
@@ -24,6 +26,9 @@ mobile/web-build/
 *.swp
 *.swo
 *~
+
+# Claude Code local settings
+.claude/settings.local.json
 
 # OS
 .DS_Store
