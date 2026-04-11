@@ -14,10 +14,10 @@ RentMy is a mobile-only, hyperlocal P2P rental marketplace. Small AI-native team
 | `/packer` | VM images (Packer) |
 | `/ansible` | Configuration management |
 | `/scripts` | Helper/utility scripts (bash or Go) |
-| `/ops` | Internal ops dashboard (Vite + React, Phase 6) |
+| `/ops` | Internal ops dashboard (Vite + React, Phase 7) |
 | `/migrations` | Database migrations (goose SQL files) |
 
-**Current state:** Phase 0 (Foundation) is complete. Phases 1–6 are planned. See `.claude/progress.json` for exact task status.
+**Current state:** Phases 0-4 complete. Phase 5 (Test Infrastructure) runs next, then Phases 6-7. See `.claude/progress.json` for exact task status.
 
 ---
 
@@ -190,7 +190,7 @@ Shared infrastructure lives in `backend/internal/platform/{package}/`:
 - Context: pass `context.Context` as first parameter
 - Handler signatures: return `http.HandlerFunc` (closures over dependencies)
 - Health checks: every infrastructure client exposes `HealthCheck(ctx context.Context) error`
-- Tests: table-driven, use testify where needed
+- Tests: table-driven, use testify where needed (see Testing section below)
 - No ORM — raw SQL via pgx
 - Input validation on all API endpoints
 - Logging: `slog` (stdlib)
@@ -220,6 +220,71 @@ Shared infrastructure lives in `backend/internal/platform/{package}/`:
 - Client state via Zustand stores in `lib/`
 - Form validation via Zod schemas
 - API client: `ky` (in `lib/api.ts`) with auth header injection
+
+---
+
+## Testing Requirements
+
+Every task MUST include tests. Code without tests is not complete.
+
+### Backend: Integration Tests (testcontainers-go)
+
+Integration tests live in `backend/tests/integration/` and run against real Postgres + Redis via testcontainers-go. They test the full HTTP API surface — request in, response out, database state verified.
+
+```
+backend/tests/integration/
+  helpers.go              # TestMain, container setup, migration runner, HTTP client factory
+  user_api_test.go        # Register, login, profile CRUD
+  listing_api_test.go     # Create, update, search, feed
+  booking_api_test.go     # Book → confirm → check-in → check-out
+  ...
+```
+
+**Rules:**
+- Every new backend endpoint MUST have at least one integration test
+- Tests use real SQL (no mocks) — the whole point is to catch query bugs
+- Test helpers provide factory functions: `createTestUser(t)`, `createTestListing(t, userID)`, etc.
+- Use `t.Parallel()` where safe; each test gets its own transaction or schema
+- Existing integration tests MUST keep passing when new code is added
+- Run with: `cd backend && go test ./tests/integration/... -v -count=1`
+
+### Backend: Unit Tests
+
+Unit tests live alongside the code (`internal/{service}/*_test.go`) and test business logic with mocks/fakes. These already exist for most services. Keep writing them for:
+- State machine transitions
+- Calculation logic (fees, scores, decay)
+- Validation rules
+- Pure functions
+
+### Mobile: Component & Screen Tests (Jest + RNTL)
+
+Tests live in `mobile/__tests__/` and use Jest + React Native Testing Library.
+
+```
+mobile/__tests__/
+  components/       # UI component renders, interactions
+  screens/          # Screen-level tests with mocked API (MSW)
+  lib/              # Hook and utility tests
+  setup.ts          # Global test setup (MSW, mocks)
+```
+
+**Rules:**
+- Every new screen MUST have at least one screen test
+- Tests render the component, interact with it, and assert on the result
+- API calls are mocked via MSW (Mock Service Worker) — no real backend needed
+- Test forms: fill inputs, submit, verify validation errors and success states
+- Test navigation: verify the right screen renders after user actions
+- Run with: `cd mobile && npx jest`
+
+### What "Done" Means
+
+A task is complete when:
+1. Code compiles (`go build`, `tsc --noEmit`)
+2. Linter passes (`go vet`)
+3. **New unit tests pass** for business logic
+4. **New integration tests pass** for API endpoints (backend tasks)
+5. **New component/screen tests pass** (mobile tasks)
+6. **All existing tests still pass** (`go test ./...`, `npx jest`)
 
 ---
 
@@ -301,6 +366,16 @@ git push -u origin task-1.1-user-service
 ## Documentation
 
 README.md files at every significant directory level. Keep them up to date. When you create a new directory, add a README.md explaining its purpose.
+
+**Root README.md:** The repo-level `README.md` is the project's public face. Update it whenever your task introduces changes that affect:
+- Project structure (new directories, renamed packages)
+- Setup instructions (new prerequisites, changed commands, new env vars)
+- Architecture (new services, infrastructure components)
+- Testing (new test types, changed test commands)
+- CI/CD (new jobs, changed triggers)
+- Roadmap (phase status changes)
+
+Check `README.md` before completing your task — if any of the above changed, update the relevant section. Do NOT rewrite the entire file; make targeted edits to keep the diff small.
 
 ---
 
