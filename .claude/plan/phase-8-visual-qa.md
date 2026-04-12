@@ -263,7 +263,117 @@
 
 ---
 
-## Step 8.15 — Documentation Cleanup & Consolidation
+## Step 8.15 — Audit: Ops Dashboard + Backend Ops Tools
+
+**Goal:** Verify all ops tools work end-to-end: dashboard renders correctly, backend endpoints return valid data, periodic jobs are scheduled, and alerts route properly. Ops tools must be coherent with the core business — metrics, fraud signals, and agent calibration should reflect real platform state.
+
+**Prerequisites:**
+- Backend running with seeded data (`cd backend && make dev`)
+- Ops dashboard running (`cd ops && npm run dev`)
+- At least one completed booking in the database (for meaningful metrics)
+
+### Ops Dashboard (ops/)
+
+**Pages to audit:**
+
+1. **Dashboard** (`/`)
+   - Verify 4 metric category cards render (Business, Trust & Safety, Supply, Demand)
+   - Verify trend charts load (7d gross revenue, fraud flag rate)
+   - Check anomaly alert banner appears/hides correctly
+
+2. **Alerts** (`/alerts`)
+   - Verify "Feed" tab shows alert instances (or empty state)
+   - Verify "Rules" tab shows all alert rules with correct fields
+   - Test acknowledge button on an alert
+   - Test toggling a rule's enabled state
+   - Test editing a rule's threshold
+
+3. **Review Queue** (`/reviews`)
+   - Verify fraud flag table renders with filters (Status, Action)
+   - Test clicking into a flag detail
+
+4. **Review Detail** (`/reviews/{flagId}`)
+   - Verify metadata renders (score, action, signals)
+   - Verify evidence viewer component
+   - Test resolution buttons (Approve / Override / Request Info)
+
+5. **Agent Decisions** (`/agents/decisions`)
+   - Verify table renders with agent type filter
+   - Test expanding a row to see reasoning/input/decision JSON
+
+6. **Agent Learning** (`/agents/learning`)
+   - Verify calibration charts render for each agent type
+   - Verify guarantee fund gauges show balance/reserve ratio
+
+7. **Referrals** (`/referrals`)
+   - Verify stats cards render (Total Codes, Conversions, Payouts, Rate)
+   - Verify referral table with status column
+
+8. **Login** (`/login`)
+   - Verify login works with seeded user credentials
+   - Verify 401 redirect when token is missing/expired
+
+### Backend Ops Endpoints
+
+**OpsAgent endpoints:**
+```bash
+# Health metrics
+curl -sf http://localhost:8080/api/v1/ops/metrics/current -H "Authorization: Bearer $TOKEN"
+curl -sf http://localhost:8080/api/v1/ops/metrics/history?duration=7d -H "Authorization: Bearer $TOKEN"
+
+# Alerts
+curl -sf http://localhost:8080/api/v1/ops/alerts -H "Authorization: Bearer $TOKEN"
+curl -sf http://localhost:8080/api/v1/ops/alerts/rules -H "Authorization: Bearer $TOKEN"
+```
+
+**FraudAgent endpoints:**
+```bash
+curl -sf http://localhost:8080/api/v1/ops/fraud/flags -H "Authorization: Bearer $TOKEN"
+curl -sf "http://localhost:8080/api/v1/ops/fraud/users/{userId}/signals" -H "Authorization: Bearer $TOKEN"
+```
+
+**Agent learning + guarantee fund:**
+```bash
+curl -sf http://localhost:8080/api/v1/ops/agents/decisions -H "Authorization: Bearer $TOKEN"
+curl -sf "http://localhost:8080/api/v1/ops/agents/calibration?agent_type=RISK" -H "Authorization: Bearer $TOKEN"
+curl -sf http://localhost:8080/api/v1/ops/agents/metrics -H "Authorization: Bearer $TOKEN"
+curl -sf http://localhost:8080/api/v1/guarantee/health -H "Authorization: Bearer $TOKEN"
+curl -sf http://localhost:8080/api/v1/ops/referrals/stats -H "Authorization: Bearer $TOKEN"
+```
+
+### Periodic Jobs
+
+Verify River workers are registered and scheduled:
+- `ops_health_check` — runs every 15 minutes
+- `fraud_pattern_scan` — runs every 6 hours
+
+### Coherence Checks
+
+- Metrics from `/ops/metrics/current` should reflect actual DB state (listings count, user count, etc.)
+- Fraud flags should reference real users and real signals
+- Agent decisions should link to real transactions
+- Guarantee fund health should match ledger entries
+- Alert rules should cover the 16 documented metrics
+- Dashboard displays should match API response shapes (no empty cards when data exists)
+
+**Deliverable:** `thoughts/audits/phase-8-visual-qa/audit-ops-tools.md`
+
+---
+
+## Step 8.16 — Fix: Ops Dashboard + Backend Ops Tools Bugs
+
+**Goal:** Fix all bugs documented in audit-ops-tools.md.
+
+**Verification:**
+- All dashboard pages render without console errors
+- All ops API endpoints return 200 with valid JSON
+- `cd ops && npx tsc --noEmit`
+- `cd backend && go vet ./...`
+- `cd backend && go build -o /dev/null ./cmd/server`
+
+---
+
+## Step 8.17 — Documentation Cleanup & Consolidation (formerly 8.15)
 
 **Goal:** Single source of truth for all docs. Remove redundant root-level phase files.
 
@@ -281,7 +391,7 @@
 
 ---
 
-## Step 8.16 — Compilation & Test Suite Health Check
+## Step 8.18 — Compilation & Test Suite Health Check (formerly 8.16)
 
 **Goal:** Ensure everything compiles and all tests pass.
 
@@ -293,15 +403,17 @@ cd backend && go test ./... -count=1
 cd mobile && npx tsc --noEmit
 cd mobile && npx expo export --platform ios
 cd mobile && npx jest --ci
+cd ops && npx tsc --noEmit
+cd ops && npx vite build
 ```
 
 Fix any failures found.
 
-**Verification:** All 6 commands pass with zero failures.
+**Verification:** All 8 commands pass with zero failures.
 
 ---
 
-## Step 8.17 — Final Verification Pass
+## Step 8.19 — Final Verification Pass (formerly 8.17)
 
 **Goal:** Full end-to-end confirmation that v0 is stable.
 
