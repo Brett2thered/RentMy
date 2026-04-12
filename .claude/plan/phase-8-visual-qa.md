@@ -23,7 +23,7 @@
    - 5+ listings via `POST /api/v1/listings` with varied prices/locations
    - 2 bookings in different states (REQUESTED, CONFIRMED)
    - 1 message thread between users
-9. Save credentials to `.claude/plan/phase-8-seed-credentials.md`
+9. Record credentials in the [Appendix: Test Seed Data](#appendix-test-seed-data) section below
 10. Take first screenshot: `xcrun simctl io booted screenshot /tmp/rentmy-bootstrap.png`
 
 **Note:** Build/infra failures get fixed here. This is the "make everything run" task.
@@ -263,14 +263,122 @@
 
 ---
 
-## Step 8.15 — Documentation Cleanup & Consolidation
+## Step 8.15 — Audit: Ops Dashboard + Backend Ops Tools
+
+**Goal:** Verify all ops tools work end-to-end: dashboard renders correctly, backend endpoints return valid data, periodic jobs are scheduled, and alerts route properly. Ops tools must be coherent with the core business — metrics, fraud signals, and agent calibration should reflect real platform state.
+
+**Prerequisites:**
+- Backend running with seeded data (`cd backend && make dev`)
+- Ops dashboard running (`cd ops && npm run dev`)
+- At least one completed booking in the database (for meaningful metrics)
+
+### Ops Dashboard (ops/)
+
+**Pages to audit:**
+
+1. **Dashboard** (`/`)
+   - Verify 4 metric category cards render (Business, Trust & Safety, Supply, Demand)
+   - Verify trend charts load (7d gross revenue, fraud flag rate)
+   - Check anomaly alert banner appears/hides correctly
+
+2. **Alerts** (`/alerts`)
+   - Verify "Feed" tab shows alert instances (or empty state)
+   - Verify "Rules" tab shows all alert rules with correct fields
+   - Test acknowledge button on an alert
+   - Test toggling a rule's enabled state
+   - Test editing a rule's threshold
+
+3. **Review Queue** (`/reviews`)
+   - Verify fraud flag table renders with filters (Status, Action)
+   - Test clicking into a flag detail
+
+4. **Review Detail** (`/reviews/{flagId}`)
+   - Verify metadata renders (score, action, signals)
+   - Verify evidence viewer component
+   - Test resolution buttons (Approve / Override / Request Info)
+
+5. **Agent Decisions** (`/agents/decisions`)
+   - Verify table renders with agent type filter
+   - Test expanding a row to see reasoning/input/decision JSON
+
+6. **Agent Learning** (`/agents/learning`)
+   - Verify calibration charts render for each agent type
+   - Verify guarantee fund gauges show balance/reserve ratio
+
+7. **Referrals** (`/referrals`)
+   - Verify stats cards render (Total Codes, Conversions, Payouts, Rate)
+   - Verify referral table with status column
+
+8. **Login** (`/login`)
+   - Verify login works with seeded user credentials
+   - Verify 401 redirect when token is missing/expired
+
+### Backend Ops Endpoints
+
+**OpsAgent endpoints:**
+```bash
+# Health metrics
+curl -sf http://localhost:8080/api/v1/ops/metrics/current -H "Authorization: Bearer $TOKEN"
+curl -sf http://localhost:8080/api/v1/ops/metrics/history?duration=7d -H "Authorization: Bearer $TOKEN"
+
+# Alerts
+curl -sf http://localhost:8080/api/v1/ops/alerts -H "Authorization: Bearer $TOKEN"
+curl -sf http://localhost:8080/api/v1/ops/alerts/rules -H "Authorization: Bearer $TOKEN"
+```
+
+**FraudAgent endpoints:**
+```bash
+curl -sf http://localhost:8080/api/v1/ops/fraud/flags -H "Authorization: Bearer $TOKEN"
+curl -sf "http://localhost:8080/api/v1/ops/fraud/users/{userId}/signals" -H "Authorization: Bearer $TOKEN"
+```
+
+**Agent learning + guarantee fund:**
+```bash
+curl -sf http://localhost:8080/api/v1/ops/agents/decisions -H "Authorization: Bearer $TOKEN"
+curl -sf "http://localhost:8080/api/v1/ops/agents/calibration?agent_type=RISK" -H "Authorization: Bearer $TOKEN"
+curl -sf http://localhost:8080/api/v1/ops/agents/metrics -H "Authorization: Bearer $TOKEN"
+curl -sf http://localhost:8080/api/v1/guarantee/health -H "Authorization: Bearer $TOKEN"
+curl -sf http://localhost:8080/api/v1/ops/referrals/stats -H "Authorization: Bearer $TOKEN"
+```
+
+### Periodic Jobs
+
+Verify River workers are registered and scheduled:
+- `ops_health_check` — runs every 15 minutes
+- `fraud_pattern_scan` — runs every 6 hours
+
+### Coherence Checks
+
+- Metrics from `/ops/metrics/current` should reflect actual DB state (listings count, user count, etc.)
+- Fraud flags should reference real users and real signals
+- Agent decisions should link to real transactions
+- Guarantee fund health should match ledger entries
+- Alert rules should cover the 16 documented metrics
+- Dashboard displays should match API response shapes (no empty cards when data exists)
+
+**Deliverable:** `thoughts/audits/phase-8-visual-qa/audit-ops-tools.md`
+
+---
+
+## Step 8.16 — Fix: Ops Dashboard + Backend Ops Tools Bugs
+
+**Goal:** Fix all bugs documented in audit-ops-tools.md.
+
+**Verification:**
+- All dashboard pages render without console errors
+- All ops API endpoints return 200 with valid JSON
+- `cd ops && npx tsc --noEmit`
+- `cd backend && go vet ./...`
+- `cd backend && go build -o /dev/null ./cmd/server`
+
+---
+
+## Step 8.17 — Documentation Cleanup & Consolidation (formerly 8.15)
 
 **Goal:** Single source of truth for all docs. Remove redundant root-level phase files.
 
 **What to do:**
-1. Delete redundant root-level files:
-   - `phase-0-foundation.md` through `phase-6-operations.md` (7 files)
-   - `.claude/plan/` has the authoritative, more detailed versions
+1. ~~Delete redundant root-level files~~ — **Done** (cleaned up in `chore/cleanup-phase-plan-docs` branch)
 2. Move to `docs/`:
    - `rentmy-prd-v8.md` → `docs/rentmy-prd-v8.md`
    - `00-index.md` → `docs/roadmap.md`
@@ -283,7 +391,7 @@
 
 ---
 
-## Step 8.16 — Compilation & Test Suite Health Check
+## Step 8.18 — Compilation & Test Suite Health Check (formerly 8.16)
 
 **Goal:** Ensure everything compiles and all tests pass.
 
@@ -295,15 +403,17 @@ cd backend && go test ./... -count=1
 cd mobile && npx tsc --noEmit
 cd mobile && npx expo export --platform ios
 cd mobile && npx jest --ci
+cd ops && npx tsc --noEmit
+cd ops && npx vite build
 ```
 
 Fix any failures found.
 
-**Verification:** All 6 commands pass with zero failures.
+**Verification:** All 8 commands pass with zero failures.
 
 ---
 
-## Step 8.17 — Final Verification Pass
+## Step 8.19 — Final Verification Pass (formerly 8.17)
 
 **Goal:** Full end-to-end confirmation that v0 is stable.
 
@@ -322,3 +432,36 @@ cd backend && go test ./... -count=1
 cd mobile && npx tsc --noEmit
 cd mobile && npx jest --ci
 ```
+
+---
+
+## Appendix: Test Seed Data
+
+### Test Users
+
+| Name | Email | Password | User ID |
+|------|-------|----------|---------|
+| Alice Test | alice@test.com | password123 | 01KNZ4649E3NV0PJB82YHG38CQ |
+| Bob Renter | bob@test.com | password123 | 01KNZ468WYRDRAGT1VSA3B4GHA |
+
+### Test Listings (all owned by Alice)
+
+| Title | Listing ID | Daily Rate |
+|-------|-----------|------------|
+| DeWalt Power Drill | 01KNZ47G1A5JWQNZ8YR8YFKS66 | $15 |
+| Canon EOS R6 Camera | 01KNZ47ZKWMNR3MRWH1AKYEDT3 | $75 |
+| Stand Up Paddleboard | 01KNZ47ZRQ4CA2NWFQ31FD7HF0 | $35 |
+| Camping Tent 4-Person | 01KNZ47ZT5QHZJFDEEK43AVN8R | $20 |
+| Pressure Washer 3000 PSI | 01KNZ47ZV9EJN9WVECTRSZDX1K | $45 |
+
+### Limitations
+
+- **No bookings**: POST /api/v1/bookings requires Stripe payment method — fails with placeholder API keys
+- **No messages**: Messages are nested under /bookings/{id}/messages — require a booking first
+- **Location**: Simulator location set to 34.0522, -118.2437 (Los Angeles)
+
+### Known Issues Found During Seeding
+
+1. `.env` had wrong postgres port (5432 vs 5433 from docker-compose) — fixed
+2. App bypasses auth gate on fresh install — goes straight to feed instead of login
+3. Location shows "unavailable" despite simulated location being set
