@@ -201,6 +201,7 @@ LOG_VIEWER="$REPO_ROOT/scripts/log-viewer.py"
 
 # Main loop
 SESSION_COUNT=0
+CONSECUTIVE_NO_PROGRESS=0
 
 while true; do
   # Check completion
@@ -231,6 +232,27 @@ while true; do
   SESSION_COUNT=$((SESSION_COUNT + 1))
   TIMESTAMP=$(date +%Y%m%d-%H%M%S)
   LOG_FILE="$LOG_DIR/session-${SESSION_COUNT}-${TIMESTAMP}.log"
+
+  # Track which task we're about to attempt (for stall detection)
+  CURRENT_TASK_ID=$(python3 -c "
+import json, sys
+with open('$PROGRESS_FILE') as f:
+    data = json.load(f)
+for phase in data['phases']:
+    if phase['status'] == 'completed': continue
+    if '$TARGET_PHASE' and phase['id'] != int('${TARGET_PHASE:-0}' or '0'): continue
+    for task in phase['tasks']:
+        if task['status'] in ('pending', 'in_progress'):
+            deps_met = True
+            for dep in task.get('dependencies', []):
+                for p in data['phases']:
+                    for t in p['tasks']:
+                        if t['id'] == dep and t['status'] != 'completed': deps_met = False
+            if deps_met or task['status'] == 'in_progress':
+                print(f\"{task['id']}:{task['status']}\")
+                sys.exit(0)
+sys.exit(1)
+" 2>/dev/null || echo "unknown")
 
   # Resolve model for this task
   TASK_MODEL=$(resolve_model)
@@ -304,6 +326,55 @@ while true; do
     if [[ -n "$UNCOMMITTED" ]]; then
       echo "  Uncommitted changes detected — preserving for next session to assess."
     fi
+  fi
+
+  # Stall detection: compare task state before vs after this session
+  POST_TASK_ID=$(python3 -c "
+import json, sys
+with open('$PROGRESS_FILE') as f:
+    data = json.load(f)
+for phase in data['phases']:
+    if phase['status'] == 'completed': continue
+    if '$TARGET_PHASE' and phase['id'] != int('${TARGET_PHASE:-0}' or '0'): continue
+    for task in phase['tasks']:
+        if task['status'] in ('pending', 'in_progress'):
+            deps_met = True
+            for dep in task.get('dependencies', []):
+                for p in data['phases']:
+                    for t in p['tasks']:
+                        if t['id'] == dep and t['status'] != 'completed': deps_met = False
+            if deps_met or task['status'] == 'in_progress':
+                print(f\"{task['id']}:{task['status']}\")
+                sys.exit(0)
+sys.exit(1)
+" 2>/dev/null || echo "unknown")
+
+  if [[ "$POST_TASK_ID" == "$CURRENT_TASK_ID" ]]; then
+    CONSECUTIVE_NO_PROGRESS=$((CONSECUTIVE_NO_PROGRESS + 1))
+    echo "WARNING: No progress detected — task state unchanged after session."
+    echo "  Before: $CURRENT_TASK_ID"
+    echo "  After:  $POST_TASK_ID"
+    echo "  Consecutive no-progress sessions: $CONSECUTIVE_NO_PROGRESS"
+    if [[ "$CONSECUTIVE_NO_PROGRESS" -ge 2 ]]; then
+      echo ""
+      echo "STOPPING: No progress after $CONSECUTIVE_NO_PROGRESS consecutive sessions."
+      echo "  The agent is stuck on: $NEXT_TASK"
+      echo "  Total sessions run: $SESSION_COUNT"
+      echo ""
+      echo "Possible causes:"
+      echo "  - Task dependencies are not satisfiable"
+      echo "  - Verification commands are failing repeatedly"
+      echo "  - Agent cannot complete the task within $MAX_TURNS turns"
+      echo ""
+      echo "Next steps:"
+      echo "  - Check the last log: $LOG_FILE"
+      echo "  - Review progress.json for blocked tasks"
+      echo "  - Run manually: claude --model $TASK_MODEL"
+      exit 1
+    fi
+  else
+    # Progress was made — reset stall counter
+    CONSECUTIVE_NO_PROGRESS=0
   fi
 
   # Pause between sessions
