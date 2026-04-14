@@ -7,10 +7,11 @@
 # PRs, but falls back to vanilla git (`git checkout -b`) if gt is unavailable.
 #
 # Usage:
-#   ./scripts/run-agent.sh              # Run until all phases complete
-#   ./scripts/run-agent.sh --dry-run    # Show next task without executing
-#   ./scripts/run-agent.sh --phase 1    # Run only Phase 1 tasks
-#   ./scripts/run-agent.sh --model opus # Force a specific model for all tasks
+#   ./scripts/run-agent.sh                   # Run until all phases complete
+#   ./scripts/run-agent.sh --dry-run         # Show next task without executing
+#   ./scripts/run-agent.sh --phase 1         # Run only Phase 1 tasks
+#   ./scripts/run-agent.sh --model opus      # Force a specific model for all tasks
+#   ./scripts/run-agent.sh --max-turns 750   # Override max turns per session
 #
 # Model selection: Each task or phase can specify a preferred model in
 # progress.json (task.model or phase.model). The --model flag overrides both.
@@ -22,7 +23,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PROGRESS_FILE="$REPO_ROOT/.claude/progress.json"
 LOG_DIR="$REPO_ROOT/thoughts/agent-logs"
 GT="/opt/homebrew/bin/gt"
-MAX_TURNS=200
+MAX_TURNS=500
 PAUSE_BETWEEN_SESSIONS=10
 USE_GT=false
 DEFAULT_MODEL="sonnet"
@@ -36,6 +37,7 @@ while [[ $# -gt 0 ]]; do
     --dry-run) DRY_RUN=true; shift ;;
     --phase) TARGET_PHASE="$2"; shift 2 ;;
     --model) MODEL_OVERRIDE="$2"; shift 2 ;;
+    --max-turns) MAX_TURNS="$2"; shift 2 ;;
     *) echo "Unknown option: $1"; exit 1 ;;
   esac
 done
@@ -233,7 +235,7 @@ while true; do
   TIMESTAMP=$(date +%Y%m%d-%H%M%S)
   LOG_FILE="$LOG_DIR/session-${SESSION_COUNT}-${TIMESTAMP}.log"
 
-  # Track which task we're about to attempt (for stall detection)
+  # Capture pre-session state for stall detection
   CURRENT_TASK_ID=$(python3 -c "
 import json, sys
 with open('$PROGRESS_FILE') as f:
@@ -253,6 +255,7 @@ for phase in data['phases']:
                 sys.exit(0)
 sys.exit(1)
 " 2>/dev/null || echo "unknown")
+  PRE_HEAD=$(cd "$REPO_ROOT" && git rev-parse HEAD 2>/dev/null || echo "unknown")
 
   # Resolve model for this task
   TASK_MODEL=$(resolve_model)
@@ -328,7 +331,7 @@ sys.exit(1)
     fi
   fi
 
-  # Stall detection: compare task state before vs after this session
+  # Stall detection: check multiple signals for progress
   POST_TASK_ID=$(python3 -c "
 import json, sys
 with open('$PROGRESS_FILE') as f:
@@ -348,12 +351,38 @@ for phase in data['phases']:
                 sys.exit(0)
 sys.exit(1)
 " 2>/dev/null || echo "unknown")
+  POST_HEAD=$(cd "$REPO_ROOT" && git rev-parse HEAD 2>/dev/null || echo "unknown")
+  POST_DIFF_COUNT=$(cd "$REPO_ROOT" && git diff --stat 2>/dev/null | wc -l | tr -d ' ')
 
-  if [[ "$POST_TASK_ID" == "$CURRENT_TASK_ID" ]]; then
+  # Progress signals (any one of these means the agent did something useful):
+  #   1. Task state changed (pending→in_progress, or task completed and moved to next)
+  #   2. New git commits were made (HEAD moved)
+  #   3. Uncommitted changes exist (agent was mid-work when it ran out of turns)
+  PROGRESS_MADE=false
+
+  if [[ "$POST_TASK_ID" != "$CURRENT_TASK_ID" ]]; then
+    echo "Progress: task state changed ($CURRENT_TASK_ID → $POST_TASK_ID)"
+    PROGRESS_MADE=true
+  fi
+
+  if [[ "$POST_HEAD" != "$PRE_HEAD" ]]; then
+    echo "Progress: new commits detected (${PRE_HEAD:0:8} → ${POST_HEAD:0:8})"
+    PROGRESS_MADE=true
+  fi
+
+  if [[ "$POST_DIFF_COUNT" -gt 0 ]]; then
+    echo "Progress: $POST_DIFF_COUNT uncommitted file changes (agent was mid-work)"
+    PROGRESS_MADE=true
+  fi
+
+  if $PROGRESS_MADE; then
+    CONSECUTIVE_NO_PROGRESS=0
+  else
     CONSECUTIVE_NO_PROGRESS=$((CONSECUTIVE_NO_PROGRESS + 1))
-    echo "WARNING: No progress detected — task state unchanged after session."
-    echo "  Before: $CURRENT_TASK_ID"
-    echo "  After:  $POST_TASK_ID"
+    echo "WARNING: No progress detected after session $SESSION_COUNT."
+    echo "  Task: $CURRENT_TASK_ID (unchanged)"
+    echo "  HEAD: ${POST_HEAD:0:8} (unchanged)"
+    echo "  Working tree: clean"
     echo "  Consecutive no-progress sessions: $CONSECUTIVE_NO_PROGRESS"
     if [[ "$CONSECUTIVE_NO_PROGRESS" -ge 2 ]]; then
       echo ""
@@ -372,9 +401,6 @@ sys.exit(1)
       echo "  - Run manually: claude --model $TASK_MODEL"
       exit 1
     fi
-  else
-    # Progress was made — reset stall counter
-    CONSECUTIVE_NO_PROGRESS=0
   fi
 
   # Pause between sessions
