@@ -1,0 +1,58 @@
+appId: ${APP_ID}
+name: "Listing - View listing detail (happy path)"
+env:
+  APP_ID: com.rentmy.app
+  TEST_LATITUDE: "34.0522"
+  TEST_LONGITUDE: "-118.2437"
+---
+# Set simulator GPS so the feed has a location for the discovery API
+- setLocation:
+    latitude: ${TEST_LATITUDE}
+    longitude: ${TEST_LONGITUDE}
+
+# Login as renter — bob@test.com. Alice's seeded listings appear in the feed.
+- runFlow: ../../helpers/login-as-renter.yaml
+
+# Feed tab should be active and at least one listing card visible
+- extendedWaitUntil:
+    visible:
+      id: "screen-feed"
+    timeout: 8000
+
+- extendedWaitUntil:
+    visible:
+      id: "listing-card"
+    timeout: 15000
+
+# Tap the first listing card to navigate to its detail screen
+- tapOn:
+    id: "listing-card"
+
+# Detail screen loads
+- extendedWaitUntil:
+    visible:
+      id: "screen-listing-detail"
+    timeout: 8000
+
+# "Rent Now" CTA visible (renter perspective — not the host)
+- extendedWaitUntil:
+    visible:
+      id: "btn-rent-now"
+    timeout: 30000
+
+# Scroll down to verify price/description/host sections render
+- scroll
+
+# Swipe up to scroll back to top
+- swipe:
+    direction: DOWN
+    duration: 500
+
+# Navigate back via the header back button
+- tapOn: "Back"
+
+# Feed is visible again after back navigation
+- extendedWaitUntil:
+    visible:
+      id: "screen-feed"
+    timeout: 6000

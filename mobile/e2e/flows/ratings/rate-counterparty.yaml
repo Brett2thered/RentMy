@@ -1,0 +1,76 @@
+appId: ${APP_ID}
+name: "Ratings - Rate a counterparty after a completed rental (happy path)"
+env:
+  APP_ID: com.rentmy.app
+  RENTER_EMAIL: bob@test.com
+  RENTER_PASSWORD: password123
+---
+# Prerequisites:
+#   - Backend running
+#   - App built with dev client: npx expo run:ios
+#   - setup.sh run (COMPLETED booking for rating seeded, no existing ratings)
+#
+# Flow: login as renter → Rentals tab → tap COMPLETED row →
+#       return-confirmation screen → tap "Rate this rental" → rate screen →
+#       select a rating bubble → submit → success message shown.
+
+# ── 1. Login as renter ───────────────────────────────────────────────────────
+- runFlow: ../../helpers/login-as-renter.yaml
+
+# ── 2. Navigate to Rentals tab ────────────────────────────────────────────────
+- tapOn:
+    text: "Rentals, tab.*"
+
+- extendedWaitUntil:
+    visible:
+      id: "screen-rentals"
+    timeout: 5000
+
+# ── 3. Scroll to a COMPLETED rental row ──────────────────────────────────────
+# COMPLETED rows sort after DISPUTED (order 4). Scroll down to find one.
+- scrollUntilVisible:
+    element:
+      id: "status-completed"
+    direction: DOWN
+
+# ── 4. Tap the COMPLETED rental row → return-confirmation screen ──────────────
+- tapOn:
+    id: "status-completed"
+
+- extendedWaitUntil:
+    visible:
+      id: "screen-return-confirmation"
+    timeout: 6000
+
+# ── 5. Tap "Rate this rental" button → rate screen ───────────────────────────
+- tapOn:
+    id: "btn-rate-rental"
+
+- extendedWaitUntil:
+    visible:
+      id: "screen-rate"
+    timeout: 5000
+
+# ── 6. Rating bubble grid is visible ─────────────────────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "rating-bubbles-container"
+    timeout: 5000
+
+# ── 7. Select a renter bubble (e.g. "Good communication") ────────────────────
+- tapOn:
+    id: "rating-bubble-GOOD_COMMUNICATION"
+
+# ── 8. Submit the rating ─────────────────────────────────────────────────────
+- tapOn:
+    id: "btn-submit-rating"
+
+# ── 9. Success message appears ───────────────────────────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "rating-success-message"
+    timeout: 8000
+
+- extendedWaitUntil:
+    visible: "Rating submitted!"
+    timeout: 3000

@@ -1,0 +1,8 @@
+appId: ${APP_ID}
+name: "Helper - Seed a DISPUTED booking (no-op)"
+env:
+  APP_ID: com.rentmy.app
+---
+# NO-OP: DISPUTED bookings are now seeded by setup.sh (SQL-based seeding).
+# The backend test endpoint this helper originally called does not exist.
+# Kept as a no-op so existing runFlow references don't break.

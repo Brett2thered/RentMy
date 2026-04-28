@@ -1,0 +1,8 @@
+appId: ${APP_ID}
+name: "Helper - Seed conversation (no-op: data from setup.sh)"
+env:
+  APP_ID: com.rentmy.app
+---
+# Conversation data is seeded by setup.sh (SQL-based) before the E2E suite runs.
+# This helper exists for compatibility but performs no action.
+# The messaging flows navigate to the Messages tab and find pre-seeded data.

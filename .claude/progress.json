@@ -1,0 +1,1709 @@
+{
+  "version": 1,
+  "lastUpdated": "2026-04-14",
+  "lastSession": {
+    "task": "9.9",
+    "status": "completed"
+  },
+  "phases": [
+    {
+      "id": 0,
+      "name": "Foundation",
+      "status": "completed",
+      "blockedBy": [],
+      "tasks": [
+        {
+          "id": "0.1",
+          "name": "Go project scaffold",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [],
+          "commitSha": "b950834",
+          "handoff": "thoughts/handoffs/phase-0-foundation/task-01-go-scaffold.md",
+          "verificationPassed": true,
+          "prdRefs": []
+        },
+        {
+          "id": "0.2",
+          "name": "Docker Compose + PostgreSQL + PostGIS + migrations",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "0.1"
+          ],
+          "commitSha": "b950834",
+          "handoff": "thoughts/handoffs/phase-0-foundation/task-02-docker-postgres.md",
+          "verificationPassed": true,
+          "prdRefs": []
+        },
+        {
+          "id": "0.3",
+          "name": "Redis integration",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "0.1"
+          ],
+          "commitSha": "b950834",
+          "handoff": "thoughts/handoffs/phase-0-foundation/task-03-05-06-redis-s3-pusher.md",
+          "verificationPassed": true,
+          "prdRefs": []
+        },
+        {
+          "id": "0.4",
+          "name": "River job queue",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "0.2"
+          ],
+          "commitSha": "b950834",
+          "handoff": "thoughts/handoffs/phase-0-foundation/task-04-river.md",
+          "verificationPassed": true,
+          "prdRefs": []
+        },
+        {
+          "id": "0.5",
+          "name": "S3 storage",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "0.1"
+          ],
+          "commitSha": "b950834",
+          "handoff": "thoughts/handoffs/phase-0-foundation/task-03-05-06-redis-s3-pusher.md",
+          "verificationPassed": true,
+          "prdRefs": []
+        },
+        {
+          "id": "0.6",
+          "name": "Pusher integration",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "0.1"
+          ],
+          "commitSha": "b950834",
+          "handoff": "thoughts/handoffs/phase-0-foundation/task-03-05-06-redis-s3-pusher.md",
+          "verificationPassed": true,
+          "prdRefs": []
+        },
+        {
+          "id": "0.7",
+          "name": "React Native scaffold",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [],
+          "commitSha": "7a9dc12",
+          "handoff": "thoughts/handoffs/phase-0-foundation/task-07-rn-scaffold.md",
+          "verificationPassed": true,
+          "prdRefs": []
+        },
+        {
+          "id": "0.8",
+          "name": "GitHub Actions CI",
+          "status": "completed",
+          "domain": "infra",
+          "dependencies": [
+            "0.1",
+            "0.7"
+          ],
+          "commitSha": "8be57fd",
+          "handoff": "thoughts/handoffs/phase-0-foundation/task-08-ci.md",
+          "verificationPassed": true,
+          "prdRefs": []
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "Users + Listings (Supply)",
+      "status": "completed",
+      "blockedBy": [],
+      "tasks": [
+        {
+          "id": "1.1",
+          "name": "UserService (backend)",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [],
+          "planRef": ".claude/plan/phase-1-supply.md#step-11",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a75-6 (system architecture, data models)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1",
+            "curl -sf http://localhost:8080/health"
+          ],
+          "commitSha": "f19fae3",
+          "handoff": "thoughts/handoffs/phase-1-supply/task-11-user-service.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "1.2",
+          "name": "MediaService (backend)",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "1.1"
+          ],
+          "planRef": ".claude/plan/phase-1-supply.md#step-12",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a76 (media table)",
+            "docs/rentmy-prd-v8.md \u00a711 (photo requirements)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1"
+          ],
+          "commitSha": "3feadd5",
+          "handoff": "thoughts/handoffs/phase-1-supply/task-12-media-service.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "1.3",
+          "name": "ListingService (backend)",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "1.1",
+            "1.2"
+          ],
+          "planRef": ".claude/plan/phase-1-supply.md#step-13",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a76 (listings table)",
+            "docs/rentmy-prd-v8.md \u00a77 (7-day ceiling)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1"
+          ],
+          "commitSha": "4650d50",
+          "handoff": "thoughts/handoffs/phase-1-supply/task-13-listing-service.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "1.4",
+          "name": "Auth screens (RN)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "1.1"
+          ],
+          "planRef": ".claude/plan/phase-1-supply.md#step-14",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit"
+          ],
+          "commitSha": "6757a98",
+          "handoff": "thoughts/handoffs/phase-1-supply/task-14-auth-screens.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "1.5",
+          "name": "Listing creation flow (RN)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "1.3",
+            "1.4"
+          ],
+          "planRef": ".claude/plan/phase-1-supply.md#step-15",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a711 (angle enforcement, gyroscope)"
+          ],
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit"
+          ],
+          "commitSha": "268851f",
+          "handoff": "thoughts/handoffs/phase-1-supply/task-15-listing-creation-flow.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "1.6",
+          "name": "Profile screen (RN)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "1.4"
+          ],
+          "planRef": ".claude/plan/phase-1-supply.md#step-16",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit"
+          ],
+          "commitSha": "091a4f2",
+          "handoff": "thoughts/handoffs/phase-1-supply/task-16-profile-screen.md",
+          "verificationPassed": true
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Discovery + Payments (Demand)",
+      "status": "pending",
+      "blockedBy": [
+        1
+      ],
+      "tasks": [
+        {
+          "id": "2.1",
+          "name": "DiscoveryService (backend)",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [],
+          "planRef": ".claude/plan/phase-2-demand.md#step-21",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a713 (ranking algorithm)",
+            "docs/rentmy-prd-v8.md \u00a76 (listings table, PostGIS)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1"
+          ],
+          "commitSha": "152cf31",
+          "handoff": "thoughts/handoffs/phase-2-demand/task-21-discovery-service.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "2.2",
+          "name": "PaymentService (backend)",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [],
+          "planRef": ".claude/plan/phase-2-demand.md#step-22",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a77 (tiered holds, guarantee fund, hold allocation)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1"
+          ],
+          "commitSha": "97160ff",
+          "handoff": "thoughts/handoffs/phase-2-demand/task-22-payment-service.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "2.3",
+          "name": "Feed screen (RN)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "2.1"
+          ],
+          "planRef": ".claude/plan/phase-2-demand.md#step-23",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit"
+          ],
+          "commitSha": "dce24cd",
+          "handoff": "thoughts/handoffs/phase-2-demand/task-23-feed-screen.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "2.4",
+          "name": "Search screen (RN)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "2.1"
+          ],
+          "planRef": ".claude/plan/phase-2-demand.md#step-24",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit"
+          ],
+          "commitSha": "dc0755a",
+          "handoff": "thoughts/handoffs/phase-2-demand/task-24-search-screen.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "2.5",
+          "name": "Map screen (RN)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "2.1"
+          ],
+          "planRef": ".claude/plan/phase-2-demand.md#step-25",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit"
+          ],
+          "commitSha": "2321ffb",
+          "handoff": "thoughts/handoffs/phase-2-demand/task-25-map-screen.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "2.6",
+          "name": "Listing detail screen (RN)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "2.1",
+            "2.2"
+          ],
+          "planRef": ".claude/plan/phase-2-demand.md#step-26",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit"
+          ],
+          "commitSha": "53fcce0",
+          "handoff": "thoughts/handoffs/phase-2-demand/task-26-listing-detail-screen.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "2.7",
+          "name": "Checkout screen (RN)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "2.2",
+            "2.6"
+          ],
+          "planRef": ".claude/plan/phase-2-demand.md#step-27",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a77 (hold amount display)"
+          ],
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit"
+          ],
+          "commitSha": "c202cc4",
+          "handoff": "thoughts/handoffs/phase-2-demand/task-27-checkout-screen.md",
+          "verificationPassed": true
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Core Transaction Loop",
+      "status": "pending",
+      "blockedBy": [
+        2
+      ],
+      "tasks": [
+        {
+          "id": "3.1",
+          "name": "BookingService (backend)",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [],
+          "planRef": ".claude/plan/phase-3-transaction.md#step-31",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a717 (state machine)",
+            "docs/rentmy-prd-v8.md \u00a718 (cancellation)",
+            "docs/rentmy-prd-v8.md \u00a79 (fraud velocity)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1"
+          ],
+          "commitSha": "b3a66c2",
+          "handoff": "thoughts/handoffs/phase-3-transaction/task-31-booking-service.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "3.2",
+          "name": "ProximityService (backend)",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "3.1"
+          ],
+          "planRef": ".claude/plan/phase-3-transaction.md#step-32",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a712 (proximity handoff)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1"
+          ],
+          "commitSha": "12dc136",
+          "handoff": "thoughts/handoffs/phase-3-transaction/task-32-proximity-service.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "3.3",
+          "name": "NotificationService (backend)",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [],
+          "planRef": ".claude/plan/phase-3-transaction.md#step-33",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a716 (notification types)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1"
+          ],
+          "commitSha": "c7a4b09",
+          "handoff": "thoughts/handoffs/phase-3-transaction/task-33-notification-service.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "3.4",
+          "name": "MessagingService (backend)",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [],
+          "planRef": ".claude/plan/phase-3-transaction.md#step-34",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a76 (messages table)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1"
+          ],
+          "commitSha": "fd737f5",
+          "handoff": "thoughts/handoffs/phase-3-transaction/task-34-messaging-service.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "3.5",
+          "name": "Booking flow (RN)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "3.1"
+          ],
+          "planRef": ".claude/plan/phase-3-transaction.md#step-35",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit"
+          ],
+          "commitSha": "00c487a",
+          "handoff": "thoughts/handoffs/phase-3-transaction/task-35-booking-flow.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "3.6",
+          "name": "Handoff screens (RN)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "3.2",
+            "3.5"
+          ],
+          "planRef": ".claude/plan/phase-3-transaction.md#step-36",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a711 (angle enforcement at check-in/check-out)"
+          ],
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit"
+          ],
+          "commitSha": "eb43ac1",
+          "handoff": "thoughts/handoffs/phase-3-transaction/task-36-handoff-screens.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "3.7",
+          "name": "Messaging screen (RN)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "3.4"
+          ],
+          "planRef": ".claude/plan/phase-3-transaction.md#step-37",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit"
+          ],
+          "commitSha": "eb1b8ba",
+          "handoff": "thoughts/handoffs/phase-3-transaction/task-37-messaging-screen.md",
+          "verificationPassed": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "AI Agents (Intelligence)",
+      "status": "pending",
+      "blockedBy": [
+        3
+      ],
+      "tasks": [
+        {
+          "id": "4.1",
+          "name": "Model router",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [],
+          "planRef": ".claude/plan/phase-4-intelligence.md#step-41",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a75 (model router)",
+            "docs/rentmy-prd-v8.md \u00a731 (agent learning)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1"
+          ],
+          "commitSha": "9e82f13",
+          "handoff": "thoughts/handoffs/phase-4-intelligence/task-41-model-router.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "4.2",
+          "name": "VerificationAgent",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "4.1"
+          ],
+          "planRef": ".claude/plan/phase-4-intelligence.md#step-42",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a76 (identity_status)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1"
+          ],
+          "commitSha": "f67e68b",
+          "handoff": "thoughts/handoffs/phase-4-intelligence/task-42-verification-agent.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "4.3",
+          "name": "AppraisalAgent",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "4.1"
+          ],
+          "planRef": ".claude/plan/phase-4-intelligence.md#step-43",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a76 (AI listing fields)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1"
+          ],
+          "commitSha": "4f86e34",
+          "handoff": "thoughts/handoffs/phase-4-intelligence/task-43-appraisal-agent.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "4.4",
+          "name": "RiskAgent",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "4.1"
+          ],
+          "planRef": ".claude/plan/phase-4-intelligence.md#step-44",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a78 (dual-score system)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1"
+          ],
+          "commitSha": "e613b60",
+          "handoff": "thoughts/handoffs/phase-4-intelligence/task-44-risk-agent.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "4.5",
+          "name": "AgreementAgent",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "4.1"
+          ],
+          "planRef": ".claude/plan/phase-4-intelligence.md#step-45",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a714 (agreement system)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1"
+          ],
+          "commitSha": "e3104da",
+          "handoff": "thoughts/handoffs/phase-4-intelligence/task-45-agreement-agent.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "4.6",
+          "name": "Wire KYC into booking flow (RN)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "4.2"
+          ],
+          "planRef": ".claude/plan/phase-4-intelligence.md#step-46",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit"
+          ],
+          "commitSha": "c95c3ae",
+          "handoff": "thoughts/handoffs/phase-4-intelligence/task-46-kyc-booking-flow.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "4.7",
+          "name": "Wire AI autofill into listing creation (RN)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "4.3"
+          ],
+          "planRef": ".claude/plan/phase-4-intelligence.md#step-47",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit"
+          ],
+          "commitSha": "3a4527b",
+          "handoff": "thoughts/handoffs/phase-4-intelligence/task-47-ai-autofill.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "4.8",
+          "name": "Backfill existing data",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "4.3",
+            "4.4"
+          ],
+          "planRef": ".claude/plan/phase-4-intelligence.md#step-48",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1"
+          ],
+          "commitSha": "ddf60d4",
+          "handoff": "thoughts/handoffs/phase-4-intelligence/task-48-backfill-existing-data.md",
+          "verificationPassed": true
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Test Infrastructure + Retroactive Coverage",
+      "status": "completed",
+      "blockedBy": [
+        4
+      ],
+      "tasks": [
+        {
+          "id": "5.1",
+          "name": "Backend integration test infrastructure",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [],
+          "planRef": ".claude/plan/phase-5-test-infrastructure.md#step-51",
+          "prdRefs": [
+            "cross-cutting.md (Testing)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./tests/integration/... -v -count=1 -timeout 120s"
+          ],
+          "commitSha": "c737f10"
+        },
+        {
+          "id": "5.2",
+          "name": "Mobile test infrastructure",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [],
+          "planRef": ".claude/plan/phase-5-test-infrastructure.md#step-52",
+          "prdRefs": [
+            "cross-cutting.md (Testing)"
+          ],
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit",
+            "cd mobile && npx jest --passWithNoTests"
+          ],
+          "commitSha": "c38fc03"
+        },
+        {
+          "id": "5.3",
+          "name": "Phase 1-2 backend integration tests",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "5.1"
+          ],
+          "planRef": ".claude/plan/phase-5-test-infrastructure.md#step-53",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd backend && go test ./tests/integration/... -v -count=1 -timeout 180s"
+          ],
+          "commitSha": "30e5d1e"
+        },
+        {
+          "id": "5.4",
+          "name": "Phase 3-4 backend integration tests",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "5.1",
+            "5.3"
+          ],
+          "planRef": ".claude/plan/phase-5-test-infrastructure.md#step-54",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd backend && go test ./tests/integration/... -v -count=1 -timeout 180s"
+          ],
+          "commitSha": "3141527"
+        },
+        {
+          "id": "5.5",
+          "name": "Phase 1-4 mobile component tests",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "5.2"
+          ],
+          "planRef": ".claude/plan/phase-5-test-infrastructure.md#step-55",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd mobile && npx jest --verbose"
+          ],
+          "commitSha": "3141527"
+        },
+        {
+          "id": "5.6",
+          "name": "CI pipeline update for tests",
+          "status": "completed",
+          "domain": "infra",
+          "dependencies": [
+            "5.1",
+            "5.2"
+          ],
+          "planRef": ".claude/plan/phase-5-test-infrastructure.md#step-56",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd backend && go test ./tests/integration/... -v -count=1 -timeout 300s",
+            "cd mobile && npx jest --ci"
+          ],
+          "commitSha": "d0604d3d1da3a482a6f9b5f40dbac30f439c731b"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Returns, Disputes, Trust",
+      "status": "pending",
+      "model": "opus",
+      "blockedBy": [
+        5
+      ],
+      "tasks": [
+        {
+          "id": "6.1",
+          "name": "Photo diff pipeline",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "5.1"
+          ],
+          "planRef": ".claude/plan/phase-6-returns-disputes-trust.md#step-61",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a711 (photo diff pipeline, two-stage)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1",
+            "cd backend && go test ./tests/integration/... -v -count=1 -timeout 180s"
+          ],
+          "commitSha": "0c5d226",
+          "verificationPassed": true,
+          "handoff": "thoughts/handoffs/phase-6-closing-loop/task-01-photo-diff-pipeline.md"
+        },
+        {
+          "id": "6.2",
+          "name": "DisputeAgent with escalation gate",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "6.1",
+            "5.1"
+          ],
+          "planRef": ".claude/plan/phase-6-returns-disputes-trust.md#step-62",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a720 (escalation gate)",
+            "docs/rentmy-prd-v8.md \u00a77 (hold allocation)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1",
+            "cd backend && go test ./tests/integration/... -v -count=1 -timeout 180s"
+          ],
+          "commitSha": "35a58c6",
+          "verificationPassed": true,
+          "handoff": "thoughts/handoffs/phase-6-closing-loop/task-02-dispute-agent.md"
+        },
+        {
+          "id": "6.3",
+          "name": "LateReturnAgent",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "5.1"
+          ],
+          "planRef": ".claude/plan/phase-6-returns-disputes-trust.md#step-63",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a719 (late return escalation)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1",
+            "cd backend && go test ./tests/integration/... -v -count=1 -timeout 180s"
+          ],
+          "commitSha": "6d867cd",
+          "verificationPassed": true,
+          "handoff": "thoughts/handoffs/phase-6-closing-loop/task-03-late-return-agent.md"
+        },
+        {
+          "id": "6.4",
+          "name": "Rating system (backend + RN)",
+          "status": "completed",
+          "model": "sonnet",
+          "domain": "backend",
+          "dependencies": [
+            "5.1",
+            "5.2"
+          ],
+          "planRef": ".claude/plan/phase-6-returns-disputes-trust.md#step-64",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a715 (rating bubbles)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1",
+            "cd backend && go test ./tests/integration/... -v -count=1 -timeout 180s",
+            "cd mobile && npx tsc --noEmit",
+            "cd mobile && npx jest"
+          ],
+          "commitSha": "356ec39bf92ede62f87a9c614976d4f52e04dc75"
+        },
+        {
+          "id": "6.5",
+          "name": "Reputation score recalculation",
+          "status": "completed",
+          "model": "sonnet",
+          "domain": "backend",
+          "dependencies": [
+            "6.4",
+            "5.1"
+          ],
+          "planRef": ".claude/plan/phase-6-returns-disputes-trust.md#step-65",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a78 (reputation scoring)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1",
+            "cd backend && go test ./tests/integration/... -v -count=1 -timeout 180s"
+          ],
+          "commitSha": "30a9259",
+          "branch": "task-6.5-reputation-score-recalculation"
+        },
+        {
+          "id": "6.6",
+          "name": "Guarantee fund accounting",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "5.1"
+          ],
+          "planRef": ".claude/plan/phase-6-returns-disputes-trust.md#step-66",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a77 (guarantee fund, reserve ratio)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1",
+            "cd backend && go test ./tests/integration/... -v -count=1 -timeout 180s"
+          ],
+          "commitSha": "d9589b0",
+          "branch": "task-6.6-guarantee-fund-accounting",
+          "verificationPassed": true
+        },
+        {
+          "id": "6.7",
+          "name": "Outcome linking (Agent Learning Framework)",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "6.2",
+            "6.3",
+            "6.5",
+            "5.1"
+          ],
+          "planRef": ".claude/plan/phase-6-returns-disputes-trust.md#step-67",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a731 (agent learning framework)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1",
+            "cd backend && go test ./tests/integration/... -v -count=1 -timeout 180s"
+          ],
+          "commitSha": "9bc1807",
+          "branch": "task-6.7-outcome-linking",
+          "verificationPassed": true
+        },
+        {
+          "id": "6.8",
+          "name": "Post-rental flow (RN)",
+          "status": "completed",
+          "model": "sonnet",
+          "domain": "mobile",
+          "dependencies": [
+            "6.2",
+            "6.4",
+            "5.2"
+          ],
+          "planRef": ".claude/plan/phase-6-returns-disputes-trust.md#step-68",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit",
+            "cd mobile && npx jest"
+          ],
+          "commitSha": "31e3fbb053bd98f0542cf31641294197d5d1cdc4"
+        },
+        {
+          "id": "6.9",
+          "name": "Guarantee fund refinement (fixes 6.6 gaps)",
+          "status": "completed",
+          "model": "opus",
+          "domain": "backend",
+          "dependencies": [
+            "6.6"
+          ],
+          "planRef": ".claude/plan/phase-6-returns-disputes-trust.md#step-69",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a77 (guarantee fund, reserve ratio)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./internal/guaranteefund/... -v -count=1",
+            "cd backend && go test ./internal/payment/... -v -count=1",
+            "cd backend && go test ./tests/integration/... -run GuaranteeFund -v -count=1 -timeout 180s"
+          ],
+          "commitSha": "93c629b",
+          "handoff": "thoughts/handoffs/phase-6-closing-loop/task-69-guarantee-fund-refinement.md",
+          "verificationPassed": true
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Operations + Growth",
+      "status": "pending",
+      "model": "sonnet",
+      "blockedBy": [
+        6
+      ],
+      "tasks": [
+        {
+          "id": "7.0",
+          "name": "Full-stack build verification & fix pass",
+          "status": "completed",
+          "model": "opus",
+          "domain": "fullstack",
+          "dependencies": [],
+          "planRef": ".claude/plan/phase-7-operations.md#step-70",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build -o /dev/null ./cmd/server",
+            "cd mobile && npx tsc --noEmit",
+            "cd mobile && npx expo export --platform web",
+            "cd backend && go test ./... -v -count=1 -timeout 120s",
+            "cd mobile && npx jest --ci"
+          ],
+          "commitSha": "1654218",
+          "verificationPassed": true,
+          "handoff": "thoughts/handoffs/phase-7-operations/task-70-fullstack-build-verification.md"
+        },
+        {
+          "id": "7.1",
+          "name": "OpsAgent",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "7.0"
+          ],
+          "planRef": ".claude/plan/phase-7-operations.md#step-71",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a725 (ops metrics, alerts)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1",
+            "cd backend && go test ./tests/integration/... -v -count=1 -timeout 180s"
+          ],
+          "commitSha": "36d0f3a",
+          "handoff": "thoughts/handoffs/phase-7-operations/task-71-ops-agent.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "7.2",
+          "name": "FraudAgent",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "7.0"
+          ],
+          "planRef": ".claude/plan/phase-7-operations.md#step-72",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a79 (fraud signals, WiFi compound-only)"
+          ],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1",
+            "cd backend && go test ./tests/integration/... -v -count=1 -timeout 180s"
+          ],
+          "commitSha": "7d3bb31b2066b30ee966e5f8f03f8c6c7f5fcb62"
+        },
+        {
+          "id": "7.3",
+          "name": "Ops dashboard (web)",
+          "status": "completed",
+          "model": "opus",
+          "domain": "web",
+          "dependencies": [
+            "7.1",
+            "7.2"
+          ],
+          "planRef": ".claude/plan/phase-7-operations.md#step-73",
+          "prdRefs": [
+            "docs/rentmy-prd-v8.md \u00a725 (dashboard metrics)",
+            "docs/rentmy-prd-v8.md \u00a731 (agent learning dashboard)"
+          ],
+          "verificationCommands": [
+            "cd ops && npx tsc --noEmit",
+            "cd ops && npm run build"
+          ],
+          "commitSha": "f673149",
+          "handoff": "thoughts/handoffs/phase-7-operations/task-7.3-ops-dashboard.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "7.4",
+          "name": "Referral system (backend + RN)",
+          "status": "completed",
+          "domain": "backend",
+          "dependencies": [
+            "7.0"
+          ],
+          "planRef": ".claude/plan/phase-7-operations.md#step-74",
+          "prdRefs": [],
+          "verificationCommands": [
+            "cd backend && go vet ./...",
+            "cd backend && go build ./cmd/server",
+            "cd backend && go test ./... -v -count=1",
+            "cd backend && go test ./tests/integration/... -v -count=1 -timeout 180s",
+            "cd mobile && npx tsc --noEmit",
+            "cd mobile && npx jest"
+          ],
+          "commitSha": "e195c3d"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Visual QA, Bug Fixing & v0 Stabilization",
+      "status": "completed",
+      "blockedBy": [
+        7
+      ],
+      "tasks": [
+        {
+          "id": "8.0",
+          "name": "Bootstrap: Full Stack + iOS Simulator + Seed Data",
+          "status": "completed",
+          "domain": "fullstack",
+          "dependencies": [],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-80",
+          "verificationCommands": [
+            "curl -sf http://localhost:8080/health",
+            "xcrun simctl io booted screenshot /tmp/rentmy-bootstrap.png"
+          ],
+          "commitSha": "2ff5b07",
+          "prdRefs": []
+        },
+        {
+          "id": "8.1",
+          "name": "Audit: Auth Flow (Login + Register)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "8.0"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-81",
+          "verificationCommands": [],
+          "prdRefs": []
+        },
+        {
+          "id": "8.2",
+          "name": "Fix: Auth Flow Bugs",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "8.1"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-82",
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit",
+            "cd mobile && npx jest",
+            "cd backend && go vet ./...",
+            "cd backend && go build -o /dev/null ./cmd/server"
+          ],
+          "commitSha": "a0a5626",
+          "prdRefs": []
+        },
+        {
+          "id": "8.3",
+          "name": "Audit: Feed + Listing Detail + Checkout",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "8.0"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-83",
+          "verificationCommands": [],
+          "prdRefs": []
+        },
+        {
+          "id": "8.4",
+          "name": "Fix: Feed + Listing Detail + Checkout Bugs",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "8.3"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-84",
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit",
+            "cd mobile && npx jest",
+            "cd backend && go vet ./...",
+            "cd backend && go build -o /dev/null ./cmd/server"
+          ],
+          "commitSha": "9be90b4",
+          "prdRefs": []
+        },
+        {
+          "id": "8.5",
+          "name": "Audit: Search + Map",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "8.0"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-85",
+          "verificationCommands": [],
+          "commitSha": "pending",
+          "prdRefs": []
+        },
+        {
+          "id": "8.6",
+          "name": "Fix: Search + Map Bugs",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "8.5"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-86",
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit",
+            "cd mobile && npx jest",
+            "cd backend && go vet ./...",
+            "cd backend && go build -o /dev/null ./cmd/server"
+          ],
+          "commitSha": "5cbb9a8",
+          "prdRefs": []
+        },
+        {
+          "id": "8.7",
+          "name": "Audit: Booking + Handoff",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "8.0"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-87",
+          "verificationCommands": [],
+          "commitSha": "3bd3319",
+          "prdRefs": []
+        },
+        {
+          "id": "8.8",
+          "name": "Fix: Booking + Handoff Bugs",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "8.7"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-88",
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit",
+            "cd mobile && npx jest",
+            "cd backend && go vet ./...",
+            "cd backend && go build -o /dev/null ./cmd/server"
+          ],
+          "commitSha": "c33a4ec",
+          "prdRefs": []
+        },
+        {
+          "id": "8.9",
+          "name": "Audit: Messaging",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "8.0"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-89",
+          "verificationCommands": [],
+          "commitSha": "a0a94fc",
+          "prdRefs": []
+        },
+        {
+          "id": "8.10",
+          "name": "Fix: Messaging Bugs",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "8.9"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-810",
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit",
+            "cd mobile && npx jest",
+            "cd backend && go vet ./...",
+            "cd backend && go build -o /dev/null ./cmd/server"
+          ],
+          "commitSha": "6c07d37",
+          "prdRefs": []
+        },
+        {
+          "id": "8.11",
+          "name": "Audit: Rentals + Disputes + Ratings",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "8.0"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-811",
+          "verificationCommands": [],
+          "commitSha": "e347591",
+          "prdRefs": []
+        },
+        {
+          "id": "8.12",
+          "name": "Fix: Rentals + Disputes + Ratings Bugs",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "8.11"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-812",
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit",
+            "cd mobile && npx jest",
+            "cd backend && go vet ./...",
+            "cd backend && go build -o /dev/null ./cmd/server"
+          ],
+          "commitSha": "5c3b4eb",
+          "prdRefs": []
+        },
+        {
+          "id": "8.13",
+          "name": "Audit: Profile + Referrals + KYC",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "8.0"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-813",
+          "verificationCommands": [],
+          "commitSha": "32bd8fb",
+          "prdRefs": []
+        },
+        {
+          "id": "8.14",
+          "name": "Fix: Profile + Referrals + KYC Bugs",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "8.13"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-814",
+          "verificationCommands": [
+            "cd mobile && npx tsc --noEmit",
+            "cd mobile && npx jest",
+            "cd backend && go vet ./...",
+            "cd backend && go build -o /dev/null ./cmd/server"
+          ],
+          "commitSha": "8924686",
+          "prdRefs": []
+        },
+        {
+          "id": "8.15",
+          "name": "Audit: Ops Dashboard + Backend Ops Tools",
+          "status": "completed",
+          "domain": "fullstack",
+          "dependencies": [
+            "8.0"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-815",
+          "verificationCommands": [],
+          "commitSha": "f85b033",
+          "prdRefs": []
+        },
+        {
+          "id": "8.16",
+          "name": "Fix: Ops Dashboard + Backend Ops Tools Bugs",
+          "status": "completed",
+          "domain": "fullstack",
+          "dependencies": [
+            "8.15"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-816",
+          "verificationCommands": [
+            "cd ops && npx tsc --noEmit",
+            "cd ops && npx vite build",
+            "cd backend && go vet ./...",
+            "cd backend && go build -o /dev/null ./cmd/server"
+          ],
+          "commitSha": "2d4491d",
+          "prdRefs": []
+        },
+        {
+          "id": "8.17",
+          "name": "Documentation Cleanup & Consolidation",
+          "status": "completed",
+          "domain": "docs",
+          "dependencies": [],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-817",
+          "verificationCommands": [],
+          "prdRefs": [],
+          "commitSha": "36b5a9e",
+          "handoff": "thoughts/handoffs/phase-8-visual-qa/task-8.17-doc-consolidation.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "8.18",
+          "name": "Compilation & Test Suite Health Check",
+          "status": "completed",
+          "domain": "fullstack",
+          "dependencies": [],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-818",
+          "verificationCommands": [
+            "cd backend && go build -o /dev/null ./cmd/server",
+            "cd backend && go vet ./...",
+            "cd backend && go test ./... -count=1",
+            "cd mobile && npx tsc --noEmit",
+            "cd mobile && npx expo export --platform ios",
+            "cd mobile && npx jest --ci",
+            "cd ops && npx tsc --noEmit",
+            "cd ops && npx vite build"
+          ],
+          "prdRefs": [],
+          "commitSha": "6f3d7dc3a09e2cf17c3b1c20f04bbefb49fa42df"
+        },
+        {
+          "id": "8.19",
+          "name": "Final Verification Pass",
+          "status": "completed",
+          "domain": "fullstack",
+          "dependencies": [
+            "8.2",
+            "8.4",
+            "8.6",
+            "8.8",
+            "8.10",
+            "8.12",
+            "8.14",
+            "8.16",
+            "8.17",
+            "8.18"
+          ],
+          "planRef": ".claude/plan/phase-8-visual-qa.md#step-819",
+          "verificationCommands": [
+            "cd backend && go build -o /dev/null ./cmd/server",
+            "cd backend && go vet ./...",
+            "cd backend && go test ./... -count=1",
+            "cd mobile && npx tsc --noEmit",
+            "cd mobile && npx jest --ci",
+            "cd ops && npx tsc --noEmit",
+            "cd ops && npx vite build"
+          ],
+          "prdRefs": []
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Mobile E2E Test Suite",
+      "status": "pending",
+      "blockedBy": [
+        8
+      ],
+      "tasks": [
+        {
+          "id": "9.0",
+          "name": "Get the app running (build + backend + simulator + first test)",
+          "status": "completed",
+          "domain": "fullstack",
+          "dependencies": [],
+          "planRef": ".claude/plan/phase-9-mobile-e2e.md#step-90",
+          "verificationCommands": [
+            "maestro --version",
+            "curl -sf http://localhost:8080/health",
+            "maestro test mobile/e2e/flows/auth/login.yaml"
+          ],
+          "prdRefs": [],
+          "requiredModel": "opus",
+          "notes": "Fix ALL build/backend/login bugs. Handoff must include full maestro test output.",
+          "commitSha": "4a2f7b5",
+          "handoff": "thoughts/handoffs/phase-9-mobile-e2e/task-00-maestro-setup.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "9.1",
+          "name": "E2E: Authentication flows",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "9.0"
+          ],
+          "planRef": ".claude/plan/phase-9-mobile-e2e.md#step-91",
+          "verificationCommands": [
+            "maestro test mobile/e2e/flows/auth/"
+          ],
+          "prdRefs": [
+            "rentmy-prd-v8.md#section-4"
+          ],
+          "requiredModel": "opus",
+          "verificationPassed": true,
+          "handoff": "thoughts/handoffs/phase-9-mobile-e2e/task-01-e2e-auth-flows.md",
+          "commitSha": "d797d31"
+        },
+        {
+          "id": "9.2",
+          "name": "E2E: Discovery flows (feed, search, map)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "9.0"
+          ],
+          "planRef": ".claude/plan/phase-9-mobile-e2e.md#step-92",
+          "verificationCommands": [
+            "maestro test mobile/e2e/flows/discovery/"
+          ],
+          "prdRefs": [
+            "rentmy-prd-v8.md#section-6"
+          ],
+          "requiredModel": "opus",
+          "commitSha": "5152587"
+        },
+        {
+          "id": "9.3",
+          "name": "E2E: Listing detail & creation",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "9.0"
+          ],
+          "planRef": ".claude/plan/phase-9-mobile-e2e.md#step-93",
+          "verificationCommands": [
+            "maestro test mobile/e2e/flows/listing/"
+          ],
+          "prdRefs": [
+            "rentmy-prd-v8.md#section-5"
+          ],
+          "requiredModel": "opus",
+          "commitSha": "be45a65",
+          "handoff": "thoughts/handoffs/phase-9-mobile-e2e/task-03-e2e-listing-flows.md",
+          "verificationPassed": true
+        },
+        {
+          "id": "9.4",
+          "name": "E2E: Profile & referral flows",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "9.0"
+          ],
+          "planRef": ".claude/plan/phase-9-mobile-e2e.md#step-94",
+          "verificationCommands": [
+            "maestro test mobile/e2e/flows/profile/"
+          ],
+          "prdRefs": [
+            "rentmy-prd-v8.md#section-15"
+          ],
+          "requiredModel": "opus",
+          "commitSha": "e377226"
+        },
+        {
+          "id": "9.5",
+          "name": "E2E: Booking request & status flows",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "9.1",
+            "9.3"
+          ],
+          "planRef": ".claude/plan/phase-9-mobile-e2e.md#step-95",
+          "verificationCommands": [
+            "maestro test mobile/e2e/flows/booking/"
+          ],
+          "prdRefs": [
+            "rentmy-prd-v8.md#section-7",
+            "rentmy-prd-v8.md#section-8"
+          ],
+          "requiredModel": "opus",
+          "commitSha": "6cc5acc"
+        },
+        {
+          "id": "9.6",
+          "name": "E2E: Handoff flows (check-in, active, check-out)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "9.5"
+          ],
+          "planRef": ".claude/plan/phase-9-mobile-e2e.md#step-96",
+          "verificationCommands": [
+            "maestro test mobile/e2e/flows/handoff/"
+          ],
+          "prdRefs": [
+            "rentmy-prd-v8.md#section-9",
+            "rentmy-prd-v8.md#section-10"
+          ],
+          "requiredModel": "opus",
+          "commitSha": "1f53335"
+        },
+        {
+          "id": "9.7",
+          "name": "E2E: Messaging flows",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "9.1"
+          ],
+          "planRef": ".claude/plan/phase-9-mobile-e2e.md#step-97",
+          "verificationCommands": [
+            "maestro test mobile/e2e/flows/messaging/"
+          ],
+          "prdRefs": [
+            "rentmy-prd-v8.md#section-12"
+          ],
+          "requiredModel": "opus",
+          "commitSha": "da2d2ea"
+        },
+        {
+          "id": "9.8",
+          "name": "E2E: Dispute & rating flows",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "9.5"
+          ],
+          "planRef": ".claude/plan/phase-9-mobile-e2e.md#step-98",
+          "verificationCommands": [
+            "maestro test mobile/e2e/flows/disputes/",
+            "maestro test mobile/e2e/flows/ratings/"
+          ],
+          "prdRefs": [
+            "rentmy-prd-v8.md#section-11",
+            "rentmy-prd-v8.md#section-13"
+          ],
+          "requiredModel": "opus",
+          "commitSha": "825ec33",
+          "verificationPassed": true,
+          "handoff": "thoughts/handoffs/phase-9-mobile-e2e/task-08-dispute-rating-flows.md"
+        },
+        {
+          "id": "9.9",
+          "name": "Full regression suite & reliability (3 consecutive green runs)",
+          "status": "completed",
+          "domain": "mobile",
+          "dependencies": [
+            "9.1",
+            "9.2",
+            "9.3",
+            "9.4",
+            "9.5",
+            "9.6",
+            "9.7",
+            "9.8"
+          ],
+          "planRef": ".claude/plan/phase-9-mobile-e2e.md#step-99",
+          "verificationCommands": [
+            "make test-mobile-e2e",
+            "make test-mobile-e2e",
+            "make test-mobile-e2e"
+          ],
+          "prdRefs": [],
+          "requiredModel": "opus",
+          "notes": "Handoff must include full terminal output of all 3 runs.",
+          "verificationPassed": true,
+          "handoff": "thoughts/handoffs/phase-9-mobile-e2e/task-09-regression-reliability.md",
+          "commitSha": "35e1a90"
+        },
+        {
+          "id": "9.10",
+          "name": "CI integration (Maestro Cloud + GitHub Actions)",
+          "status": "pending",
+          "domain": "infra",
+          "dependencies": [
+            "9.9"
+          ],
+          "planRef": ".claude/plan/phase-9-mobile-e2e.md#step-910",
+          "verificationCommands": [
+            "make test-mobile-e2e-cloud"
+          ],
+          "prdRefs": [],
+          "requiredModel": "opus"
+        },
+        {
+          "id": "9.11",
+          "name": "Documentation & CLAUDE.md update",
+          "status": "pending",
+          "domain": "docs",
+          "dependencies": [
+            "9.10"
+          ],
+          "planRef": ".claude/plan/phase-9-mobile-e2e.md#step-911",
+          "verificationCommands": [
+            "test -f mobile/e2e/README.md"
+          ],
+          "prdRefs": [],
+          "requiredModel": "opus"
+        }
+      ]
+    }
+  ]
+}

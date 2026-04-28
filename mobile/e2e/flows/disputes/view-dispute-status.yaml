@@ -1,0 +1,80 @@
+appId: ${APP_ID}
+name: "Disputes - View dispute status for a pre-seeded disputed booking"
+env:
+  APP_ID: com.rentmy.app
+  RENTER_EMAIL: bob@test.com
+  RENTER_PASSWORD: password123
+---
+# Prerequisites:
+#   - Backend running
+#   - App built with dev client: npx expo run:ios
+#   - setup.sh run (DISPUTED booking with PENDING dispute seeded)
+#
+# Flow: login as renter → Rentals tab → tap DISPUTED row →
+#       dispute-status screen renders → timeline visible → back navigates
+#       to rentals list.
+
+# ── 1. Login as renter ───────────────────────────────────────────────────────
+- runFlow: ../../helpers/login-as-renter.yaml
+
+# ── 2. Navigate to Rentals tab ────────────────────────────────────────────────
+- tapOn:
+    text: "Rentals, tab.*"
+
+- extendedWaitUntil:
+    visible:
+      id: "screen-rentals"
+    timeout: 5000
+
+# ── 3. DISPUTED booking should appear in the list ─────────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "status-disputed"
+    timeout: 5000
+
+# ── 4. Tap the "Dispute open" button on the DISPUTED row ──────────────────────
+# Tap the dedicated Pressable badge instead of the row text. This avoids the
+# iOS accessibility tree issue where text taps don't propagate to parent
+# Pressables inside FlatList rows.
+- scrollUntilVisible:
+    element:
+      id: "btn-view-dispute"
+    direction: DOWN
+
+- tapOn:
+    id: "btn-view-dispute"
+
+# ── 5. Dispute-status screen renders ─────────────────────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "screen-dispute-status"
+    timeout: 10000
+
+# ── 6. Timeline is visible and at the "Filed" step ───────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "dispute-timeline"
+    timeout: 5000
+
+- extendedWaitUntil:
+    visible: "Filed"
+    timeout: 3000
+
+# ── 7. Dispute details section is present ────────────────────────────────────
+- extendedWaitUntil:
+    visible: "Dispute details"
+    timeout: 3000
+
+# ── 8. Navigate back to rentals list ─────────────────────────────────────────
+- scrollUntilVisible:
+    element:
+      id: "btn-back-to-rentals-dispute"
+    direction: DOWN
+
+- tapOn:
+    id: "btn-back-to-rentals-dispute"
+
+- extendedWaitUntil:
+    visible:
+      id: "screen-rentals"
+    timeout: 5000

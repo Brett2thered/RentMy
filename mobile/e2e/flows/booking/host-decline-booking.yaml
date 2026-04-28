@@ -1,0 +1,54 @@
+appId: ${APP_ID}
+name: "Booking - Host declines booking request"
+env:
+  APP_ID: com.rentmy.app
+  API_URL: http://localhost:8080
+  HOST_EMAIL: alice@test.com
+  HOST_PASSWORD: password123
+---
+# Prerequisites:
+#   - Backend running with seeded data (setup.sh seeds REQUESTED bookings)
+#   - App built with dev client
+#   - alice@test.com has at least one REQUESTED booking as host (from seed)
+#
+# Flow: login as host → Rentals tab → tap a REQUESTED booking → decline →
+#       verify status changes to "Booking declined".
+
+# ── 1. Login as host ─────────────────────────────────────────────────────────
+- runFlow: ../../helpers/login-as-host.yaml
+
+# ── 2. Navigate to Rentals tab ───────────────────────────────────────────────
+- tapOn:
+    text: "Rentals, tab.*"
+
+- extendedWaitUntil:
+    visible:
+      id: "screen-rentals"
+    timeout: 5000
+
+# ── 3. Tap a REQUESTED booking row ───────────────────────────────────────────
+- tapOn:
+    id: "status-requested"
+
+- extendedWaitUntil:
+    visible:
+      id: "screen-booking-status"
+    timeout: 5000
+
+# ── 4. Decline the booking ───────────────────────────────────────────────────
+- assertVisible:
+    id: "btn-decline"
+
+- tapOn:
+    id: "btn-decline"
+
+# ── 5. Status changes to "Booking declined" ──────────────────────────────────
+- extendedWaitUntil:
+    visible: "Booking declined"
+    timeout: 8000
+
+- assertVisible:
+    id: "booking-status-label"
+
+# ── 6. Verify the terminal "Back to feed" button is shown ────────────────────
+- assertVisible: "Back to feed"

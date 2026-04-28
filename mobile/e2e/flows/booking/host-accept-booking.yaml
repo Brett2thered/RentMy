@@ -1,0 +1,55 @@
+appId: ${APP_ID}
+name: "Booking - Host accepts booking request"
+env:
+  APP_ID: com.rentmy.app
+  API_URL: http://localhost:8080
+  HOST_EMAIL: alice@test.com
+  HOST_PASSWORD: password123
+---
+# Prerequisites:
+#   - Backend running with seeded data (setup.sh seeds REQUESTED bookings)
+#   - App built with dev client
+#   - alice@test.com has at least one REQUESTED booking as host (from seed)
+#
+# Flow: login as host → Rentals tab → tap a REQUESTED booking → accept →
+#       verify status changes to "Booking accepted".
+
+# ── 1. Login as host ─────────────────────────────────────────────────────────
+- runFlow: ../../helpers/login-as-host.yaml
+
+# ── 2. Navigate to Rentals tab ───────────────────────────────────────────────
+- tapOn:
+    text: "Rentals, tab.*"
+
+- extendedWaitUntil:
+    visible:
+      id: "screen-rentals"
+    timeout: 5000
+
+# ── 3. Tap a REQUESTED booking row (use status text to target the right one) ─
+- tapOn:
+    id: "status-requested"
+
+- extendedWaitUntil:
+    visible:
+      id: "screen-booking-status"
+    timeout: 5000
+
+# ── 4. Host sees the IncomingRequest card with Accept / Decline buttons ───────
+- assertVisible:
+    id: "incoming-request-timer"
+
+- assertVisible:
+    id: "btn-accept"
+
+# ── 5. Accept the booking ────────────────────────────────────────────────────
+- tapOn:
+    id: "btn-accept"
+
+# ── 6. Status changes to "Booking accepted" ──────────────────────────────────
+- extendedWaitUntil:
+    visible: "Booking accepted"
+    timeout: 8000
+
+- assertVisible:
+    id: "booking-status-label"

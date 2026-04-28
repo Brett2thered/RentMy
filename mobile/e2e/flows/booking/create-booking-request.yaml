@@ -1,0 +1,96 @@
+appId: ${APP_ID}
+name: "Booking - Create booking request (happy path)"
+env:
+  APP_ID: com.rentmy.app
+  API_URL: http://localhost:8080
+  RENTER_EMAIL: bob@test.com
+  RENTER_PASSWORD: password123
+---
+# Prerequisites:
+#   - Backend running (stub payment adapter active when Stripe not configured)
+#   - App built with dev client: npx expo run:ios
+#   - alice@test.com has at least one active listing visible in the feed
+#   - bob@test.com stripe_customer_id set (seed/setup.sh ensures this)
+#
+# Flow: login → feed → tap listing → Rent Now → checkout → select dates →
+# payment auto-selected (__DEV__ bypass) → confirm → booking-status screen.
+
+# ── 0. Set simulator GPS so the feed can resolve nearby listings ──────────────
+- setLocation:
+    latitude: 34.0522
+    longitude: -118.2437
+
+# ── 1. Login as renter ───────────────────────────────────────────────────────
+- runFlow: ../../helpers/login-as-renter.yaml
+
+# ── 2. Navigate to Feed tab (already there post-login) ───────────────────────
+- assertVisible:
+    id: "screen-feed"
+
+# ── 3. Tap first listing card ────────────────────────────────────────────────
+- tapOn:
+    id: "listing-card"
+
+- extendedWaitUntil:
+    visible:
+      id: "screen-listing-detail"
+    timeout: 5000
+
+# ── 4. Tap "Rent Now" ────────────────────────────────────────────────────────
+- tapOn:
+    id: "btn-rent-now"
+
+# ── 5. Assert checkout screen ────────────────────────────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "screen-checkout"
+    timeout: 5000
+
+# ── 6. Select start date: tap centre of start label to initialise, then
+#       increment start time forward by 4 hours so the end can be set later. ──
+- tapOn:
+    id: "lbl-start-date"
+
+- tapOn:
+    id: "btn-start-increase"
+
+- tapOn:
+    id: "btn-start-increase"
+
+- tapOn:
+    id: "btn-start-increase"
+
+- tapOn:
+    id: "btn-start-increase"
+
+# ── 7. Increment end date by 2 hours beyond start ────────────────────────────
+- tapOn:
+    id: "lbl-end-date"
+
+- tapOn:
+    id: "btn-end-increase"
+
+- tapOn:
+    id: "btn-end-increase"
+
+# ── 8. Payment method auto-selected in __DEV__ (no Stripe sheet shown) ───────
+- extendedWaitUntil:
+    visible:
+      id: "payment-method-selected"
+    timeout: 3000
+
+# ── 9. Confirm booking ───────────────────────────────────────────────────────
+- tapOn:
+    id: "btn-confirm-booking"
+
+# ── 10. Assert booking-status screen with "Waiting for host" ─────────────────
+#  The checkout redirects to booking-status after successful creation.
+- extendedWaitUntil:
+    visible:
+      id: "screen-booking-status"
+    timeout: 10000
+
+- assertVisible:
+    id: "booking-status-label"
+
+- assertVisible: "Waiting for host"
