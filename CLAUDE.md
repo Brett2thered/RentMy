@@ -17,7 +17,7 @@ RentMy is a mobile-only, hyperlocal P2P rental marketplace. Small AI-native team
 | `/ops` | Internal ops dashboard (Vite + React, Phase 7) |
 | `/migrations` | Database migrations (goose SQL files) |
 
-**Current state:** Phases 0-8 complete. Phase 9 (Mobile E2E Test Suite) is next. See `.claude/progress.json` for exact task status.
+**Current state:** Phases 0-9 complete. The full milestone is shipped — backend, mobile, AI agents, ops, visual QA, and the 28-flow Maestro E2E suite with Maestro Cloud CI integration. See `.claude/progress.json` for exact task status.
 
 ---
 
@@ -36,8 +36,9 @@ cd backend && make build        # Build binary to bin/server
 cd mobile && npm ci             # Install dependencies
 cd mobile && npx expo start     # Start Expo dev server
 cd mobile && npx tsc --noEmit   # TypeScript check
-make test-mobile-e2e            # Run full Maestro E2E suite (requires simulator + backend)
+make test-mobile-e2e            # Run full Maestro E2E suite (requires simulator + backend + seeded data)
 make test-mobile-e2e-auth       # Run auth E2E flows only
+make test-mobile-e2e-cloud      # Run full suite on Maestro Cloud (requires MAESTRO_CLOUD_API_KEY, APK, public backend URL)
 ```
 
 ### Infrastructure
@@ -72,7 +73,7 @@ terraform -chdir=terraform/environments/dev apply plans/dev.tfplan
 | `thoughts/handoffs/phase-{N}-*/task-*.md` | Per-task completion handoff documents |
 | `thoughts/ledgers/CONTINUITY_CLAUDE-phase-{N}-*.md` | Phase-level progress summaries |
 | `thoughts/commits/*/reasoning.md` | Commit reasoning documents |
-| `mobile/e2e/` | Maestro E2E test flows (YAML), helpers, and fixtures |
+| `mobile/e2e/` | Maestro E2E test flows (YAML), helpers, seed scripts — see `mobile/e2e/README.md` |
 
 ---
 
@@ -281,6 +282,29 @@ mobile/__tests__/
 - Test navigation: verify the right screen renders after user actions
 - Run with: `cd mobile && npx jest`
 
+### Mobile: E2E Tests (Maestro)
+
+Full reference lives in `mobile/e2e/README.md`. Conventions every change should follow:
+
+**testID naming.** All Maestro selectors target `testID` props — never text. Pattern:
+- Screens: `screen-{route-name}` (e.g. `screen-feed`, `screen-checkout`)
+- Buttons: `btn-{action}` (e.g. `btn-confirm-booking`, `btn-sign-out`)
+- Inputs: `input-{field}` (e.g. `input-email`, `input-dispute-description`)
+- Lists/rows: `{noun}-list`, `{noun}-row` — for rows that need to be uniquely targeted across runs, suffix the row testID with stable seeded data (e.g. `rental-row-king0001`)
+- For row taps inside `FlatList` on iOS, the tap target must be a `Pressable` with its own `testID` — `Text` taps don't propagate to parent `Pressable` through the iOS accessibility tree
+
+**SafeAreaView pitfall.** On RN 0.81.5 with tab `headerShown: true`, `ScrollView` content does **not** render inside `SafeAreaView`. Use plain `View` instead. This applies to any screen using `testID` containers — `SafeAreaView` does not propagate the testID to child Maestro queries on iOS.
+
+**No `E2E_MODE` env var.** The repo has moved off env-flag-based test mode. Test-friendly behaviour is selected automatically:
+- Payment stub activates when `STRIPE_SECRET_KEY=sk_test_placeholder` (`backend/internal/payment/stub.go`)
+- Camera bypass activates when `__DEV__ && !device` in `AngleEnforcedCamera.native.tsx`
+
+**Seeding.** Run `bash mobile/e2e/seed/setup.sh` to seed accounts + listings + booking states. Idempotent — re-run between suite runs. Phase 9 flows assume specific deterministic ULIDs (`king0001` etc.) and GPS coordinates set by this script.
+
+**Maestro execution order.** `maestro test <dir>` does **not** execute alphabetically. Flows that share DB state must either seed independently or use timestamp offsets to control which row sorts first.
+
+**Cloud E2E.** `make test-mobile-e2e-cloud` runs the same suite on Maestro Cloud. Required env: `MAESTRO_CLOUD_API_KEY`, `E2E_APP_BINARY` (built APK), `E2E_BACKEND_URL` (must be set at *build time*, not run time — `EXPO_PUBLIC_API_URL` is inlined into the JS bundle by Metro). The CI workflow at `.github/workflows/e2e-mobile.yml` does this on push to main; it skips early when `MAESTRO_CLOUD_API_KEY` is unset.
+
 ### What "Done" Means
 
 A task is complete when:
@@ -291,7 +315,8 @@ A task is complete when:
 5. **New integration tests pass** for API endpoints (backend tasks)
 6. **New component/screen tests pass** (mobile tasks)
 7. **All existing tests still pass** (`go test ./...`, `npx jest`)
-8. **E2E regression suite passes** for any mobile or backend change (`make test-mobile-e2e`) — this is the definitive check that existing user flows still work. If the E2E suite is set up (Phase 9+), this is a BLOCKING requirement.
+8. **E2E regression suite passes** for any mobile or backend change (`make test-mobile-e2e`) — this is the definitive check that existing user flows still work. The suite is live (28 flows, 3-run reliability validation in task 9.9), so this is a BLOCKING requirement for mobile and backend tasks.
+9. **Maestro Cloud workflow not broken** — if you touch `Makefile` E2E targets, `mobile/app.json` (Android package, iOS bundle id), or `.github/workflows/e2e-mobile.yml`, verify `make test-mobile-e2e-cloud` still hits its preflight gates with actionable errors when env is missing.
 
 ---
 

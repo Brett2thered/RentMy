@@ -146,3 +146,15 @@
   2. Add GitHub Actions secrets: `MAESTRO_CLOUD_API_KEY`, `E2E_BACKEND_URL`
   3. Deploy a public dev backend so the cloud-built APK can reach an API
 - **Verification:** `make test-mobile-e2e-cloud` exercises all three preflight gates (no key → APK not found → backend URL missing) with actionable errors. Real cloud run requires operator setup above.
+
+## Task 9.11: Documentation & CLAUDE.md update
+- **Status:** Completed
+- **Branch:** `task-9.11-docs` (git fallback)
+- **Files changed:** `mobile/e2e/README.md`, `README.md` (root), `CLAUDE.md`
+- **Stale content removed:** `EXPO_PUBLIC_E2E_MODE` build flag, `E2E_MODE=true make dev`, `POST /api/v1/test/booking`, missing `fixtures/` dir, 12-min suite duration figure (actual ~18min). Root README roadmap was most stale — showed Phase 5 as "Next".
+- **Key additions:**
+  - `mobile/e2e/README.md`: seed-script step, Maestro Cloud section with preflight-gate table, execution-order quirk note, updated pass-rate from 9.9
+  - `README.md`: roadmap updated to phases 0-9 Complete, E2E rows in test hierarchy, `test-mobile-e2e-cloud` command, `e2e-mobile.yml` workflow documented
+  - `CLAUDE.md`: Mobile E2E section with testID naming conventions, SafeAreaView pitfall, no-E2E_MODE clarification, Maestro execution-order rule, cloud build-time vs run-time gotcha; "What Done Means" expanded with E2E as BLOCKING + cloud-workflow preservation rule
+- **Phase-status field drift left alone:** progress.json has `phase.status: "pending"` on phases 2/3/4/6/7 despite all tasks completed — task-level data is correct; phase-level field fix is out of scope.
+- **Verification:** `test -f mobile/e2e/README.md` ✓ PASS. Grep checks confirm `test-mobile-e2e-cloud` referenced in all three docs.

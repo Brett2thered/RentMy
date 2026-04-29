@@ -231,7 +231,8 @@ mobile/app/(tabs)/(feed)/my-screen.tsx
 | Backend unit | `go test` | `internal/*/..._test.go` | Business logic with mocks |
 | Backend integration | testcontainers-go | `tests/integration/` | Full API surface, real DB |
 | Mobile component | Jest + RNTL | `__tests__/` | UI rendering, interactions |
-| Mobile E2E | (future) | — | Full app flows on simulator |
+| Mobile E2E (local) | Maestro | `mobile/e2e/flows/` | 28 flows on iOS Simulator — see [`mobile/e2e/README.md`](mobile/e2e/README.md) |
+| Mobile E2E (cloud) | Maestro Cloud | `.github/workflows/e2e-mobile.yml` | Same 28 flows on Android in CI on push to main |
 
 ### Running tests
 
@@ -252,6 +253,12 @@ cd mobile && npx jest --coverage
 # Single test file
 cd backend && go test ./internal/booking/ -run TestStateMachine -v
 cd mobile && npx jest __tests__/screens/auth.test.tsx
+
+# Full mobile E2E suite (requires Maestro CLI + booted iOS simulator + seeded data)
+make test-mobile-e2e            # all 28 flows on local iOS simulator
+make test-mobile-e2e-auth       # one category
+make test-mobile-e2e-cloud      # same suite on Maestro Cloud (Android APK + cloud runners)
+# See mobile/e2e/README.md for setup, debugging, and Maestro Cloud (CI) usage.
 ```
 
 ### Writing tests
@@ -278,7 +285,9 @@ All configuration is via environment variables. Copy `.env.example` to `.env` fo
 
 ## CI/CD
 
-GitHub Actions runs on every push to `main` and every pull request:
+Two GitHub Actions workflows:
+
+### `.github/workflows/ci.yml` — every PR + push to `main`
 
 | Job | What it does |
 |-----|-------------|
@@ -288,7 +297,18 @@ GitHub Actions runs on every push to `main` and every pull request:
 | **Mobile TypeScript** | `npx tsc --noEmit` |
 | **Mobile Tests** | `npx jest --ci` |
 
-See `.github/workflows/ci.yml` for the full pipeline.
+### `.github/workflows/e2e-mobile.yml` — push to `main` only
+
+| Job | What it does |
+|-----|-------------|
+| **E2E (Android via Maestro Cloud)** | Build APK with Expo prebuild + Gradle, upload to Maestro Cloud, run all 28 flows |
+
+Skipped (with an explicit log line) when `MAESTRO_CLOUD_API_KEY` secret is unset.
+Required secrets:
+
+- `MAESTRO_CLOUD_API_KEY` — from https://console.mobile.dev/
+- `E2E_BACKEND_URL` — public URL of the backend the cloud-built APK will hit
+  (cloud runners cannot reach `localhost`)
 
 ## Roadmap
 
@@ -299,9 +319,11 @@ See `.github/workflows/ci.yml` for the full pipeline.
 | 2 | Complete | Discovery + Payments (search, maps, Stripe, feed/search/checkout screens) |
 | 3 | Complete | Transactions (booking state machine, proximity, notifications, messaging) |
 | 4 | Complete | AI Agents (model router, verification, appraisal, risk, agreement agents) |
-| 5 | Next | Test Infrastructure (testcontainers, Jest+RNTL, retroactive coverage, CI) |
-| 6 | Planned | Returns, Disputes, Trust (photo diff, dispute agent, reputation, guarantee fund) |
-| 7 | Planned | Operations + Growth (ops dashboard, fraud agent, referrals) |
+| 5 | Complete | Test Infrastructure (testcontainers, Jest+RNTL, retroactive coverage, CI) |
+| 6 | Complete | Returns, Disputes, Trust (photo diff, dispute agent, reputation, guarantee fund) |
+| 7 | Complete | Operations + Growth (ops dashboard, fraud agent, referrals) |
+| 8 | Complete | Visual QA, Bug Fixing & v0 Stabilization |
+| 9 | Complete | Mobile E2E Test Suite (28 Maestro flows + Maestro Cloud CI) |
 
 See `.claude/progress.json` for detailed task-level status.
 
