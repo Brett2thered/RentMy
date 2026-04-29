@@ -1,0 +1,118 @@
+name: Mobile E2E (Maestro Cloud)
+
+# Runs the full Maestro E2E suite on Maestro Cloud against an uploaded
+# Android build. Only triggers on push to main per phase-9 plan.
+#
+# Required GitHub secrets (set under Settings → Secrets and variables → Actions):
+#   MAESTRO_CLOUD_API_KEY  — API key from https://console.mobile.dev/
+#   E2E_BACKEND_URL        — public URL of the backend the uploaded build will hit
+#                            (must be reachable from Maestro Cloud runners — localhost
+#                            does NOT work; deploy a dev backend or expose via tunnel)
+#
+# When MAESTRO_CLOUD_API_KEY is unset the workflow skips early with a
+# clear log line so the first push to main after setup doesn't fail before
+# the operator has had a chance to add the secret.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e-android:
+    name: E2E (Android via Maestro Cloud)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Check Maestro Cloud secret
+        id: gate
+        run: |
+          if [ -z "${{ secrets.MAESTRO_CLOUD_API_KEY }}" ]; then
+            echo "MAESTRO_CLOUD_API_KEY is not set — skipping cloud E2E."
+            echo "Add the secret under Settings → Secrets and variables → Actions to enable."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.gate.outputs.skip != 'true'
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        if: steps.gate.outputs.skip != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Set up JDK 17
+        if: steps.gate.outputs.skip != 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle cache
+        if: steps.gate.outputs.skip != 'true'
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install mobile dependencies
+        if: steps.gate.outputs.skip != 'true'
+        working-directory: mobile
+        run: npm ci
+
+      - name: Expo prebuild (Android)
+        if: steps.gate.outputs.skip != 'true'
+        working-directory: mobile
+        env:
+          EXPO_PUBLIC_API_URL: ${{ secrets.E2E_BACKEND_URL }}
+        run: npx expo prebuild --platform android --no-install --clean
+
+      - name: Build release APK
+        if: steps.gate.outputs.skip != 'true'
+        working-directory: mobile/android
+        env:
+          EXPO_PUBLIC_API_URL: ${{ secrets.E2E_BACKEND_URL }}
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Locate APK
+        if: steps.gate.outputs.skip != 'true'
+        id: apk
+        run: |
+          APK=$(find mobile/android/app/build/outputs/apk/release -name '*.apk' | head -n1)
+          if [ -z "$APK" ]; then
+            echo "No APK produced under mobile/android/app/build/outputs/apk/release"
+            exit 1
+          fi
+          echo "path=$APK" >> "$GITHUB_OUTPUT"
+          ls -lh "$APK"
+
+      - name: Install Maestro
+        if: steps.gate.outputs.skip != 'true'
+        run: |
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Run Maestro Cloud
+        if: steps.gate.outputs.skip != 'true'
+        env:
+          MAESTRO_CLOUD_API_KEY: ${{ secrets.MAESTRO_CLOUD_API_KEY }}
+          E2E_APP_BINARY: ${{ steps.apk.outputs.path }}
+          E2E_BACKEND_URL: ${{ secrets.E2E_BACKEND_URL }}
+        run: make test-mobile-e2e-cloud
+
+      - name: Upload APK on failure
+        if: failure() && steps.gate.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: ${{ steps.apk.outputs.path }}
+          if-no-files-found: ignore
+          retention-days: 7

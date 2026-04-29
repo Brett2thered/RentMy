@@ -129,3 +129,20 @@
   - Re-seed data between each run to ensure identical starting state
 - **Results:** 3 consecutive green runs — 28/28 Passed in 18m 25s, 18m 24s, 18m 57s
 - **Verification:** `make test-mobile-e2e` × 3 — all 28/28 Passed. Zero flaky tests.
+
+## Task 9.10: CI Integration (Maestro Cloud + GitHub Actions)
+- **Status:** Completed
+- **Branch:** `task-9.10-ci-integration` (git fallback — Graphite not installed)
+- **Files added:** `.github/workflows/e2e-mobile.yml`
+- **Files changed:** `Makefile` (`test-mobile-e2e-cloud`, `_e2e-cloud-preflight` targets)
+- **Key decisions:**
+  - Android-only — iOS Maestro Cloud needs Apple Developer signing; defer until creds exist
+  - Workflow gates on `MAESTRO_CLOUD_API_KEY` secret being set; skips early with a clear log line when missing so the first push to `main` after merge doesn't fail before the operator adds the secret
+  - `make test-mobile-e2e-cloud` preflight aborts with actionable errors if `MAESTRO_CLOUD_API_KEY` / `E2E_APP_BINARY` / `E2E_BACKEND_URL` are missing, rather than letting `maestro cloud` produce an opaque failure
+  - `EXPO_PUBLIC_API_URL` is exported during `expo prebuild` and `gradlew assembleRelease`, not at run time — `process.env` is baked into the JS bundle at build time
+  - Workflow uses `ubuntu-latest` (no paid macOS minutes) + `actions/setup-java@v4` (Temurin 17) + `gradle/actions/setup-gradle@v4` for Gradle cache
+- **Operator setup required (out of code scope):**
+  1. Create Maestro Cloud account and generate API key
+  2. Add GitHub Actions secrets: `MAESTRO_CLOUD_API_KEY`, `E2E_BACKEND_URL`
+  3. Deploy a public dev backend so the cloud-built APK can reach an API
+- **Verification:** `make test-mobile-e2e-cloud` exercises all three preflight gates (no key → APK not found → backend URL missing) with actionable errors. Real cloud run requires operator setup above.
